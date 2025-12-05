@@ -14,13 +14,17 @@
     <!-- SECURITY: CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://generativelanguage.googleapis.com https://en.wikipedia.org https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com; img-src 'self' data: https: blob:;">
 
-    <!-- CRITICAL STABILITY FIX: React 17 -->
+    <!-- STABILITY: React 17 Legacy Core -->
     <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
+    <!-- FIREBASE COMPAT SDKS -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
     <style>
-        /* SENTINEL THEME APPLIED TO COMMAND CENTER */
         :root { 
             --bg-color: #000000; 
             --card-bg: #111111; 
@@ -31,14 +35,15 @@
             --success-color: #22c55e; 
         }
         
-        body, html { margin: 0; padding: 0; height: 100%; box-sizing: border-box; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Rajdhani', sans-serif; overflow: hidden; display: flex; justify-content: center; }
+        /* --- CORE LAYOUT LOCK --- */
+        html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Rajdhani', sans-serif; display: flex; justify-content: center; }
         
-        #root { width: 100%; max-width: 1024px; background-color: var(--bg-color); min-height: 100vh; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        #root { width: 100%; max-width: 1024px; height: 100%; display: flex; flex-direction: column; background-color: var(--bg-color); position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
         .hidden { display: none !important; }
         
-        /* HEADER */
-        header { padding: 15px 20px; background-color: rgba(0, 0, 0, 0.95); border-bottom: 2px solid var(--primary-red); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        /* HEADER (Fixed Height) */
+        header { flex: 0 0 auto; padding: 15px 20px; background-color: rgba(0, 0, 0, 0.95); border-bottom: 2px solid var(--primary-red); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
         header h1 { margin: 0; font-size: 1.5em; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
         .title-red { color: var(--primary-red); }
         
@@ -50,234 +55,358 @@
         .nav-btn { padding: 8px 16px; background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-muted); font-family: 'Rajdhani', sans-serif; cursor: pointer; font-weight: 600; text-transform: uppercase; border-radius: 2px; }
         .nav-btn.active { background-color: var(--primary-red); color: white; border-color: var(--primary-red); }
         
-        /* MAIN LAYOUT */
-        main { flex-grow: 1; overflow-y: auto; padding: 20px; }
+        /* MAIN LAYOUT CONTAINER (Fills remaining space) */
+        main { 
+            flex: 1 1 auto; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; /* Prevents main from scrolling, inner containers scroll instead */
+            padding: 20px; 
+            min-height: 0; /* Crucial for Flexbox scrolling */
+        }
         
-        /* LOGIN */
+        /* VIEW CONTAINERS */
+        #live-view, #logs-view {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            min-height: 0; /* Crucial */
+        }
+
+        /* --- LOGIN --- */
         .login-container { display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; }
         .login-box { background: var(--card-bg); padding: 40px; border: 1px solid var(--border-color); width: 90%; max-width: 400px; text-align: center; border-radius: 4px; }
         .input-field { width: 100%; padding: 14px; background: #000; border: 1px solid var(--border-color); color: white; border-radius: 2px; box-sizing: border-box; margin-bottom: 15px; font-family: 'Rajdhani', sans-serif; font-size: 16px; }
         .btn-primary { background: var(--primary-red); color: white; padding: 14px 20px; border: none; border-radius: 2px; cursor: pointer; font-weight: 700; text-transform: uppercase; width: 100%; }
 
-        /* LIVE FEED */
-        .live-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-        .live-card { background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--success-color); padding: 20px; border-radius: 4px; }
+        /* --- LIVE FEED --- */
+        .live-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+            gap: 20px; 
+            overflow-y: scroll; 
+            height: 100%; 
+            padding-right: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .live-card { background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--success-color); padding: 20px; border-radius: 4px; height: max-content; }
         .live-card h3 { margin: 0 0 10px 0; color: white; font-size: 1.4em; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
         .live-card p { margin: 6px 0; font-size: 1em; color: var(--text-muted); }
         .status { color: var(--success-color); font-weight: bold; }
         .coords { font-family: monospace; color: var(--primary-red); background: #000; padding: 8px; display: block; margin-top: 15px; border: 1px solid var(--border-color); text-align: center; }
         
-        /* LOGS */
-        .logs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card-bg); padding: 15px; border: 1px solid var(--border-color); }
-        .print-btn { background: #333; color: white; border: 1px solid var(--border-color); padding: 8px 16px; cursor: pointer; font-weight: bold; font-family: 'Rajdhani', sans-serif; }
+        /* --- LOGS VIEW --- */
+        .logs-container { 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            min-height: 0; 
+        }
+        
+        .logs-controls { 
+            flex: 0 0 auto; /* Don't shrink */
+            display: flex; 
+            gap: 10px; 
+            align-items: flex-end; 
+            flex-wrap: wrap; 
+            margin-bottom: 20px; 
+            background-color: var(--card-bg); 
+            padding: 15px; 
+            border: 1px solid var(--border-color); 
+        }
+        
+        .filter-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 150px; }
+        .filter-label { color: var(--primary-red); font-size: 12px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+        .filter-select { background: #000; color: white; border: 1px solid var(--border-color); padding: 10px; font-family: 'Rajdhani', sans-serif; border-radius: 2px; width: 100%; height: 40px; }
+        
+        .print-btn { background: #333; color: white; border: 1px solid var(--border-color); padding: 0 20px; cursor: pointer; font-weight: bold; font-family: 'Rajdhani', sans-serif; height: 40px; margin-bottom: 0; }
+        .print-btn:hover { background: var(--primary-red); border-color: var(--primary-red); }
+
+        /* TABLE WRAPPER - THE SCROLL ENGINE */
+        .table-wrapper { 
+            flex: 1 1 auto; /* Take all remaining space */
+            overflow-y: scroll; /* FORCE SCROLLBAR */
+            border: 1px solid var(--border-color); 
+            background: #000; 
+            position: relative; 
+            min-height: 0; /* Critical for nested flex scroll */
+            -webkit-overflow-scrolling: touch;
+        }
+        
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th { text-align: left; padding: 15px; background: #1a1a1a; color: var(--text-muted); border-bottom: 2px solid var(--primary-red); }
+        th { text-align: left; padding: 15px; background: #1a1a1a; color: var(--text-muted); border-bottom: 2px solid var(--primary-red); position: sticky; top: 0; z-index: 10; }
         td { text-align: left; padding: 15px; border-bottom: 1px solid var(--border-color); color: white; }
         
-        /* SCROLLBAR */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 4px; }
+        /* --- AGGRESSIVE PERMANENT SCROLLBAR STYLING --- */
+        /* Works on Chrome, Edge, Safari, Android Webview */
+        
+        ::-webkit-scrollbar { 
+            width: 16px; /* Wide enough to hit with a thumb */
+            height: 16px;
+            display: block !important; 
+        }
+        ::-webkit-scrollbar-track { 
+            background: #111; 
+            border-left: 1px solid #333;
+        }
+        ::-webkit-scrollbar-thumb { 
+            background-color: var(--primary-red); 
+            border-radius: 2px; 
+            border: 3px solid #111; /* Creates a gap for visual separation */
+        }
+        ::-webkit-scrollbar-thumb:hover { 
+            background-color: #ff0000; 
+        }
+        
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-red) #111;
+        }
     </style>
 </head>
 <body>
+
     <div id="root"></div>
 
     <script>
         window.onerror = function(message, source, lineno, colno, error) {
-            const root = document.getElementById('root');
-            root.innerHTML = `<div style="position:fixed; top:0; left:0; width:100%; height:100%; background:black; color:red; padding:20px; font-family:monospace; white-space:pre-wrap;">⚠️ SYSTEM CRASH ⚠️\n\n${message}\n\nLine: ${lineno}</div>`;
+            document.body.innerHTML = `<div style="padding:20px; color:red; background:black; font-family:monospace;">SYSTEM FAILURE: ${message} (Line ${lineno})</div>`;
         };
     </script>
-
-    <!-- FIREBASE BRIDGE -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
+    
+    <script type="text/babel">
+        // --- INIT FIREBASE ---
         const firebaseConfig = {
-            apiKey: "AIzaSyBwhzGsK-ah7ObMOgpRDlzGghycLNinm6g",
+            apiKey: "AIzaSyBwhzGsK-ah7ObMOgpRDlzGghycLNinm6g", 
             authDomain: "tforce-guardian-system.firebaseapp.com",
             projectId: "tforce-guardian-system",
             storageBucket: "tforce-guardian-system.firebasestorage.app",
             messagingSenderId: "194168927826",
             appId: "1:194168927826:web:18073e1a188b8e4408118b"
         };
-
-        try {
-            const app = initializeApp(firebaseConfig);
-            window.fbAuth = getAuth(app);
-            window.fbDb = getFirestore(app);
-            window.fbFuncs = { onAuthStateChanged, signInWithEmailAndPassword, signOut, collection, onSnapshot };
-            window.dispatchEvent(new Event('firebase-ready'));
-        } catch (e) {
-            console.error("Firebase Init Error:", e);
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-    </script>
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-    <!-- APP LOGIC -->
-    <script type="text/babel">
-        (function() {
-            const { useState, useEffect } = React;
+        const { useState, useEffect } = React;
 
-            // --- UTILS ---
-            const formatFullDateTime = (timestamp) => {
-                if (!timestamp || !timestamp.toDate) return "PENDING...";
-                try {
-                    const d = timestamp.toDate();
-                    return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()} ${d.toLocaleTimeString()}`; 
-                } catch(e) { return "ERROR"; }
+        // --- UTILS ---
+        const formatFullDateTime = (timestamp) => {
+            if (!timestamp || !timestamp.toDate) return "PENDING...";
+            try {
+                const d = timestamp.toDate();
+                return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()} ${d.toLocaleTimeString()}`; 
+            } catch(e) { return "ERROR"; }
+        };
+
+        const formatLastSignal = (timestamp) => {
+             if (!timestamp || !timestamp.toDate) return "PENDING...";
+             try {
+                 const d = timestamp.toDate();
+                 const now = new Date();
+                 const isToday = d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                 return isToday ? d.toLocaleTimeString() : `${d.getDate()}/${d.getMonth()+1} ${d.toLocaleTimeString()}`;
+             } catch(e) { return "ERROR"; }
+        };
+
+        // --- COMPONENTS ---
+
+        const Login = () => {
+            const [email, setEmail] = useState("");
+            const [pass, setPass] = useState("");
+            const handleLogin = (e) => {
+                e.preventDefault();
+                auth.signInWithEmailAndPassword(email, pass).catch(err => alert(err.message));
             };
-
-            const formatLastSignal = (timestamp) => {
-                 if (!timestamp || !timestamp.toDate) return "PENDING...";
-                 try {
-                     const d = timestamp.toDate();
-                     const now = new Date();
-                     const isToday = d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-                     return isToday ? d.toLocaleTimeString() : `${d.getDate()}/${d.getMonth()+1} ${d.toLocaleTimeString()}`;
-                 } catch(e) { return "ERROR"; }
-            };
-
-            // --- COMPONENTS ---
-
-            const Login = () => {
-                const [email, setEmail] = useState("");
-                const [pass, setPass] = useState("");
-                const handleLogin = (e) => {
-                    e.preventDefault();
-                    window.fbFuncs.signInWithEmailAndPassword(window.fbAuth, email, pass).catch(err => alert(err.message));
-                };
-                return (
-                    <div className="login-container">
-                        <div className="login-box">
-                            <h2 style={{color:'var(--primary-red)', marginBottom:'20px'}}>COMMAND ACCESS</h2>
-                            <form onSubmit={handleLogin}>
-                                <input className="input-field" type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required />
-                                <input className="input-field" type="password" placeholder="Password" value={pass} onChange={e=>setPass(e.target.value)} required />
-                                <button type="submit" className="btn-primary">AUTHENTICATE</button>
-                            </form>
-                        </div>
+            return (
+                <div className="login-container">
+                    <div className="login-box">
+                        <h2 style={{color:'var(--primary-red)', marginBottom:'20px'}}>COMMAND ACCESS</h2>
+                        <form onSubmit={handleLogin}>
+                            <input className="input-field" type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required />
+                            <input className="input-field" type="password" placeholder="Password" value={pass} onChange={e=>setPass(e.target.value)} required />
+                            <button type="submit" className="btn-primary">AUTHENTICATE</button>
+                        </form>
                     </div>
-                );
-            };
+                </div>
+            );
+        };
 
-            const LiveFeed = () => {
-                const [units, setUnits] = useState([]);
-                useEffect(() => {
-                    const unsub = window.fbFuncs.onSnapshot(window.fbFuncs.collection(window.fbDb, 'locations'), snapshot => {
-                        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                        const now = new Date();
-                        const active = data.filter(u => {
-                            if(!u.timestamp) return false;
+        const LiveFeed = () => {
+            const [units, setUnits] = useState([]);
+            useEffect(() => {
+                const unsub = db.collection('locations').onSnapshot(snapshot => {
+                    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    const now = new Date();
+                    const active = data.filter(u => {
+                        if(!u.timestamp) return false;
+                        try {
                             const diff = (now - u.timestamp.toDate()) / 1000 / 60; 
                             return u.onDuty && diff < 60; 
-                        });
-                        setUnits(active);
+                        } catch(e) { return false; }
                     });
-                    return () => unsub();
-                }, []);
+                    setUnits(active);
+                });
+                return () => unsub();
+            }, []);
 
-                return (
-                    <div className="live-grid">
-                        {units.length === 0 && <p style={{gridColumn: '1/-1', textAlign:'center', color:'#666', fontSize:'1.2em', marginTop:'50px'}}>NO ACTIVE UNITS DETECTED</p>}
-                        {units.map(unit => (
-                            <div key={unit.id} className="live-card">
-                                <h3>{unit.username}</h3>
-                                <p className="status">● ON DUTY</p>
-                                <p>Last Signal: {formatLastSignal(unit.timestamp)}</p>
-                                <code className="coords">{unit.latitude ? unit.latitude.toFixed(5) : '0.0000'}, {unit.longitude ? unit.longitude.toFixed(5) : '0.0000'}</code>
-                                <a href={`https://www.google.com/maps?q=${unit.latitude},${unit.longitude}`} target="_blank" style={{color:'#dc2626', textDecoration:'none', display:'block', marginTop:'15px', fontSize:'0.9em', fontWeight:'bold', textAlign:'right'}}>OPEN MAP &rarr;</a>
-                            </div>
-                        ))}
-                    </div>
-                );
-            };
-
-            const ScanLogs = () => {
-                const [logs, setLogs] = useState([]);
-                useEffect(() => {
-                    // Simplified query to avoid index requirement initially
-                    const unsub = window.fbFuncs.onSnapshot(window.fbFuncs.collection(window.fbDb, 'scan_logs'), snapshot => {
-                        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                        // Sort manually to be safe
-                        data.sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
-                        setLogs(data.slice(0, 50));
-                    });
-                    return () => unsub();
-                }, []);
-
-                return (
-                    <div>
-                        <div className="logs-header">
-                            <h3 style={{margin:0, color:'var(--primary-red)'}}>RECENT CHECKPOINTS</h3>
-                            <button className="print-btn" onClick={() => window.print()}>PRINT REPORT</button>
+            return (
+                <div className="live-grid">
+                    {units.length === 0 && <p style={{gridColumn: '1/-1', textAlign:'center', color:'#666', fontSize:'1.2em', marginTop:'50px'}}>NO ACTIVE UNITS DETECTED</p>}
+                    {units.map(unit => (
+                        <div key={unit.id} className="live-card">
+                            <h3>{unit.username}</h3>
+                            <p className="status">● ON DUTY</p>
+                            <p>Last Signal: {formatLastSignal(unit.timestamp)}</p>
+                            <code className="coords">{unit.latitude ? unit.latitude.toFixed(5) : '0.0000'}, {unit.longitude ? unit.longitude.toFixed(5) : '0.0000'}</code>
+                            <a href={`https://www.google.com/maps?q=${unit.latitude},${unit.longitude}`} target="_blank" style={{color:'#dc2626', textDecoration:'none', display:'block', marginTop:'15px', fontSize:'0.9em', fontWeight:'bold', textAlign:'right'}}>OPEN MAP &rarr;</a>
                         </div>
-                        <div style={{overflowX: 'auto', border: '1px solid var(--border-color)', borderRadius: '4px'}}>
-                            <table style={{width:'100%', minWidth:'600px', fontSize:'1.1em'}}>
-                                <thead><tr><th>DATE & TIME</th><th>OFFICER</th><th>LOCATION</th></tr></thead>
-                                <tbody>
-                                    {logs.map(log => (
+                    ))}
+                </div>
+            );
+        };
+
+        const ScanLogs = () => {
+            const [logs, setLogs] = useState([]);
+            const [filterArea, setFilterArea] = useState('ALL');
+            const [filterMonth, setFilterMonth] = useState('');
+            const [dynamicAreas, setDynamicAreas] = useState([]);
+            
+            useEffect(() => {
+                const unsub = db.collection('scan_logs').orderBy("timestamp", "desc").limit(500)
+                    .onSnapshot(snapshot => {
+                        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        setLogs(data);
+                        
+                        const foundAreas = new Set();
+                        data.forEach(item => {
+                            const area = item.checkpointData || "";
+                            if (area && area !== "Villa Main Gate") {
+                                foundAreas.add(area);
+                            }
+                        });
+                        setDynamicAreas([...foundAreas].sort());
+                    });
+                return () => unsub();
+            }, []);
+
+            const filteredLogs = logs.filter(log => {
+                const area = log.checkpointData || "";
+                if (area === "Villa Main Gate") return false;
+
+                let matchArea = false;
+                if (filterArea === 'ALL') {
+                    matchArea = true;
+                } else if (filterArea === 'GROUP_APOTHIKI') {
+                    matchArea = area.includes("Αποθήκη 56") || area.includes("Apothiki 56");
+                } else if (filterArea === 'GROUP_EKALI') {
+                    matchArea = area.includes("Εκάλη") || area.includes("Ekali");
+                } else {
+                    matchArea = area === filterArea;
+                }
+                
+                let matchDate = true;
+                if (filterMonth && log.timestamp && log.timestamp.toDate) {
+                    try {
+                        const d = log.timestamp.toDate();
+                        const logYm = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+                        matchDate = logYm === filterMonth;
+                    } catch(e) { matchDate = false; }
+                }
+
+                return matchArea && matchDate;
+            });
+
+            return (
+                <div className="logs-container">
+                    <div className="logs-controls">
+                        <div className="filter-group">
+                            <label className="filter-label">FILTER BY AREA</label>
+                            <select className="filter-select" value={filterArea} onChange={e => setFilterArea(e.target.value)}>
+                                <option value="ALL">ALL AREAS</option>
+                                <option value="GROUP_APOTHIKI">Αποθήκη 56 (All Points)</option>
+                                <option value="GROUP_EKALI">Εκάλη (All Points)</option>
+                                <option disabled>──────────</option>
+                                {dynamicAreas.map(area => <option key={area} value={area}>{area}</option>)}
+                            </select>
+                        </div>
+                        
+                        <div className="filter-group">
+                            <label className="filter-label">FILTER BY MONTH</label>
+                            <input type="month" className="filter-select" value={filterMonth} onChange={e => setFilterMonth(e.target.value)} />
+                        </div>
+
+                        <button className="print-btn" onClick={() => window.print()}>PRINT REPORT</button>
+                    </div>
+
+                    <div className="table-wrapper">
+                        <table id="scan-log-table">
+                            <thead><tr><th>DATE & TIME</th><th>OFFICER</th><th>LOCATION</th></tr></thead>
+                            <tbody>
+                                {filteredLogs.length === 0 ? (
+                                    <tr><td colspan="3" style={{textAlign:'center', color:'#666'}}>NO RECORDS FOUND</td></tr>
+                                ) : (
+                                    filteredLogs.map(log => (
                                         <tr key={log.id}>
                                             <td style={{fontFamily:'monospace', color:'var(--text-muted)'}}>{formatFullDateTime(log.timestamp)}</td>
                                             <td style={{fontWeight:'bold'}}>{log.username}</td>
                                             <td style={{color:'white'}}>{log.checkpointData}</td>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- ROOT COMPONENT ---
+        const App = () => {
+            const [user, setUser] = useState(null);
+            const [view, setView] = useState('live');
+            const [loading, setLoading] = useState(true);
+
+            useEffect(() => {
+                const unsub = auth.onAuthStateChanged(u => {
+                    setUser(u);
+                    setLoading(false);
+                });
+                return () => unsub();
+            }, []);
+
+            if(loading) return <div style={{display:'flex', justifyContent:'center', alignItems:'center', height:'100%', color:'var(--primary-red)', fontSize:'24px', letterSpacing:'2px'}}>INITIALIZING T-FORCE SYSTEMS...</div>;
+            
+            if (!user) return <Login />;
+
+            return (
+                <div id="app-container">
+                    <header>
+                        <h1><span className="title-red">T-FORCE</span> <span style={{color:'white'}}>COMMAND</span></h1>
+                        <nav>
+                            <button className={`nav-btn ${view==='live'?'active':''}`} onClick={()=>setView('live')}>ACTIVE UNITS</button>
+                            <button className={`nav-btn ${view==='logs'?'active':''}`} onClick={()=>setView('logs')}>SCAN LOGS</button>
+                        </nav>
+                        <button className="sign-out-btn" onClick={() => auth.signOut()}>SIGN OUT</button>
+                    </header>
+
+                    <main>
+                        <div id="live-view" style={{display: view === 'live' ? 'block' : 'none', height: '100%'}}>
+                            <LiveFeed />
                         </div>
-                    </div>
-                );
-            };
+                        <div id="logs-view" style={{display: view === 'logs' ? 'block' : 'none', height: '100%'}}>
+                            <ScanLogs />
+                        </div>
+                    </main>
+                </div>
+            );
+        };
 
-            // --- ROOT COMPONENT ---
-            const App = () => {
-                const [user, setUser] = useState(null);
-                const [fbReady, setFbReady] = useState(false);
-                const [view, setView] = useState('live');
-
-                useEffect(() => {
-                    const init = () => {
-                        if(window.fbFuncs && window.fbAuth) {
-                            window.fbFuncs.onAuthStateChanged(window.fbAuth, (u) => { 
-                                setUser(u); 
-                                setFbReady(true); 
-                            });
-                        }
-                    };
-                    if(window.fbAuth) init();
-                    window.addEventListener('firebase-ready', init);
-                    return () => window.removeEventListener('firebase-ready', init);
-                }, []);
-
-                if(!fbReady) return <div style={{color:'var(--primary-red)', display:'flex', justifyContent:'center', alignItems:'center', height:'100vh', fontSize:'24px', letterSpacing:'2px'}}>INITIALIZING SYSTEM...</div>;
-                
-                if (!user) return <Login />;
-
-                return (
-                    <div id="app-container">
-                        <header>
-                            <h1><span className="title-red">T-FORCE</span> <span style={{color:'white'}}>COMMAND</span></h1>
-                            <nav>
-                                <button className={`nav-btn ${view==='live'?'active':''}`} onClick={()=>setView('live')}>ACTIVE UNITS</button>
-                                <button className={`nav-btn ${view==='logs'?'active':''}`} onClick={()=>setView('logs')}>SCAN LOGS</button>
-                            </nav>
-                            <button className="sign-out-btn" onClick={() => window.fbFuncs.signOut(window.fbAuth)}>SIGN OUT</button>
-                        </header>
-
-                        <main>
-                            {view === 'live' && <LiveFeed />}
-                            {view === 'logs' && <ScanLogs />}
-                        </main>
-                    </div>
-                );
-            };
-
-            // CRITICAL: Use LEGACY RENDER METHOD
-            ReactDOM.render(<App />, document.getElementById('root'));
-        })();
+        ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
 </html>
