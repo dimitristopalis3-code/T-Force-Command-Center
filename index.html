@@ -4,853 +4,256 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>T-Force Security - Unified Command Center</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     
-    <meta name="theme-color" content="#030810"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <meta name="theme-color" content="#000000"/>
 
     <style>
         :root {
-            --bg-color: #030810;
-            --primary-glow: #00d9ff;
-            --secondary-glow: #00a2ff;
-            --text-color: #e6f7ff;
-            --border-color: rgba(0, 217, 255, 0.3);
-            --error-color: #ff4d4d;
-            --dark-red: #AA0000;
+            --bg-color: #000000;
+            --card-bg: #111111;
+            --primary-red: #dc2626;
+            --text-color: #ffffff;
+            --text-muted: #9ca3af;
+            --border-color: #333333;
+            --success-color: #22c55e;
         }
         
-        /* --- CORE LAYOUT & SCROLLING FIXES --- */
         body, html { margin: 0; padding: 0; height: 100%; box-sizing: border-box; }
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Orbitron', sans-serif;
-            overflow: hidden; /* Prevents body scroll, we scroll inside main */
-        }
-        .hidden { display: none !important; }
-
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Rajdhani', sans-serif; overflow: hidden; }
+        
         /* --- Login Screen --- */
-        #login-container { display: flex; justify-content: center; align-items: center; height: 100dvh; }
-        .login-box { background-color: rgba(0, 42, 60, 0.7); padding: 40px; border: 2px solid var(--border-color); border-radius: 10px; box-shadow: 0 0 25px var(--border-color); width: 90%; max-width: 400px; text-align: center; }
-        .login-box .logo { max-width: 200px; margin-bottom: 20px; }
-        .login-box h2 { color: var(--primary-glow); margin-bottom: 20px; }
-        #login-form input { width: 100%; padding: 12px; margin-bottom: 15px; background-color: rgba(0, 42, 60, 0.8); border: 1px solid var(--border-color); border-radius: 5px; color: var(--text-color); font-family: 'Orbitron', sans-serif; box-sizing: border-box; }
-        .error-message { color: var(--error-color); margin-top: 15px; min-height: 1.2em; }
+        .login-container { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: var(--bg-color); width: 100%; }
+        .login-box { background-color: var(--card-bg); padding: 40px; border: 1px solid var(--border-color); border-radius: 4px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8); width: 90%; max-width: 400px; text-align: center; }
+        .login-box h2 { color: var(--primary-red); margin-bottom: 20px; letter-spacing: 1px; text-transform: uppercase; }
+        .login-input { width: 100%; padding: 14px; margin-bottom: 15px; background: #000; border: 1px solid var(--border-color); color: white; border-radius: 2px; box-sizing: border-box; font-size: 16px; }
+        .save-btn { padding: 14px 20px; background-color: var(--primary-red); color: white; border: none; border-radius: 2px; cursor: pointer; font-weight: 700; text-transform: uppercase; width: 100%; }
         
-        /* --- Buttons --- */
-        .save-btn { padding: 10px 20px; background-color: var(--primary-glow); color: var(--bg-color); border: none; border-radius: 5px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: bold; transition: background-color 0.3s ease; }
-        .save-btn:hover { background-color: #fff; }
-
-        /* --- Main App Shell --- */
-        /* Updated to 100dvh for mobile browser bar compatibility */
-        #app-container { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+        /* --- App Shell --- */
+        .app-container { display: flex; flex-direction: column; height: 100vh; width: 100%; }
+        header { text-align: center; padding: 15px; background: rgba(0,0,0,0.95); border-bottom: 2px solid var(--primary-red); flex-shrink: 0; }
+        header h1 { margin: 0; font-size: 1.8em; font-weight: 700; text-transform: uppercase; }
+        .title-red { color: var(--primary-red); }
         
-        header { position: relative; text-align: center; padding: 20px; background-color: rgba(3, 8, 16, 0.95); border-bottom: 1px solid var(--border-color); flex-shrink: 0; z-index: 10; }
-        header h1 { margin: 0 0 15px 0; font-size: 1.2em; text-transform: uppercase; letter-spacing: 2px; }
-        header h1 .title-red { color: var(--error-color); }
-        header h1 .title-white { color: var(--text-color); }
-        header .logo { opacity: 0.8; max-width: 120px; display: block; margin: 0 auto 10px; }
+        .sign-out-btn { position: absolute; top: 20px; right: 20px; background: none; border: 1px solid var(--border-color); color: var(--text-muted); padding: 5px 10px; cursor: pointer; color: white; font-family: 'Rajdhani', sans-serif; text-transform: uppercase; font-weight: bold; }
         
-        /* Mobile adjustment for Sign Out */
-        #sign-out-btn { position: absolute; top: 20px; right: 20px; background-color: transparent; border: 1px solid var(--secondary-glow); color: var(--secondary-glow); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 0.8em; }
+        nav { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+        .nav-btn { padding: 10px 20px; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; font-weight: 600; text-transform: uppercase; }
+        .nav-btn.active { background: var(--primary-red); color: white; border-color: var(--primary-red); }
         
-        nav { display: flex; justify-content: center; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
-        .nav-btn { padding: 8px 12px; background-color: transparent; border: 1px solid var(--border-color); color: var(--text-color); font-family: 'Orbitron', sans-serif; cursor: pointer; transition: all 0.3s ease; border-radius: 5px; font-size: 0.9em; }
-        .nav-btn.active { background-color: var(--primary-glow); color: var(--bg-color); border-color: var(--primary-glow); box-shadow: 0 0 10px var(--primary-glow); }
+        main { flex-grow: 1; overflow-y: auto; padding: 20px; }
         
-        main { flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; position: relative; }
+        /* --- Live Feed --- */
+        .live-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .live-card { background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--success-color); padding: 20px; border-radius: 4px; }
+        .live-card h3 { margin: 0 0 10px 0; color: white; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+        .live-card p { margin: 5px 0; color: var(--text-muted); }
+        .status { color: var(--success-color); font-weight: bold; }
+        .coords { display: block; background: #000; padding: 8px; margin-top: 10px; color: var(--primary-red); font-family: monospace; border: 1px solid var(--border-color); }
         
-        #roster-view { padding: 15px; padding-bottom: 80px; } /* Extra padding for floating btn */
-        #command-center-view { display: flex; height: 100%; }
-        #logs-view { padding: 15px; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; }
-        
-        /* --- Scan Log Spreadsheet Styles --- */
-        .logs-controls { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; background-color: rgba(0, 42, 60, 0.5); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); align-items: flex-end; }
-        .logs-controls select, .logs-controls input { background-color: rgba(0, 20, 30, 0.9); border: 1px solid var(--secondary-glow); color: var(--text-color); padding: 10px; font-family: 'Orbitron', sans-serif; border-radius: 4px; min-width: 140px; flex-grow: 1; }
-        
-        .print-btn { background-color: var(--secondary-glow); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: bold; flex-grow: 0; white-space: nowrap; height: 40px; }
-        .print-btn:hover { background-color: #fff; color: var(--bg-color); }
-
-        .table-container { flex-grow: 1; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; background-color: rgba(0, 20, 30, 0.6); }
-        
-        #scan-log-table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        #scan-log-table th, #scan-log-table td { text-align: left; padding: 12px 15px; border-bottom: 1px solid rgba(0, 217, 255, 0.1); }
-        #scan-log-table th { background-color: rgba(0, 217, 255, 0.15); color: var(--primary-glow); position: sticky; top: 0; backdrop-filter: blur(5px); font-weight: bold; letter-spacing: 1px; z-index: 5; }
-        #scan-log-table tr:hover { background-color: rgba(0, 217, 255, 0.05); }
-        #scan-log-table td.cell-timestamp { color: var(--secondary-glow); font-family: monospace; font-size: 1em; }
-        #scan-log-table td.cell-user { font-weight: bold; color: white; }
-        #scan-log-table td.cell-location { color: var(--primary-glow); }
-
-        /* --- Map Container --- */
-        .map-container { flex: 1; height: 100%; min-height: 400px; } 
-        .sidebar { min-width: 300px; max-width: 300px; background-color: rgba(0, 42, 60, 0.5); padding: 20px; overflow-y: auto; border-right: 1px solid var(--border-color); }
-        .sidebar h2 { margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; color: var(--secondary-glow); }
-        .user-list-item { padding: 10px; margin-bottom: 8px; border-radius: 5px; background-color: rgba(0, 42, 60, 0.8); cursor: pointer; transition: background-color 0.2s; border: 1px solid var(--border-color); }
-        .user-list-item.active { background-color: var(--dark-red); color: white; border-color: var(--error-color); }
-        
-        /* --- Personnel Roster Views --- */
-        .stats-container { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
-        .stat-card { background-color: rgba(0, 42, 60, 0.5); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 0 5px var(--border-color); flex-basis: 150px; flex-grow: 1; }
-        .stat-card h3 { margin: 0 0 10px 0; color: var(--secondary-glow); font-size: 0.9em; font-weight: normal; }
-        .stat-card p { margin: 0; font-size: 2em; color: var(--primary-glow); font-weight: bold; }
-        .controls-container { display: flex; gap: 15px; margin-bottom: 25px; flex-direction: column; }
-        @media (min-width: 768px) { .controls-container { flex-direction: row; } }
-        
-        #search-bar, #status-filter { flex-grow: 1; padding: 12px; background-color: rgba(0, 42, 60, 0.8); border: 1px solid var(--border-color); border-radius: 5px; color: var(--text-color); font-family: 'Orbitron', sans-serif; }
-        #personnel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; padding-bottom: 60px; }
-        .personnel-card { background-color: rgba(0, 42, 60, 0.5); border: 1px solid var(--border-color); border-radius: 8px; text-align: center; padding: 15px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 0 5px var(--border-color); }
-        .personnel-card img { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--primary-glow); object-fit: cover; }
-        .personnel-card p { margin-top: 10px; font-weight: bold; font-size: 0.9em; word-wrap: break-word; }
-
-        /* --- Modals --- */
-        .modal-container { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); justify-content: center; align-items: center; padding: 10px; box-sizing: border-box; backdrop-filter: blur(3px); }
-        /* Mobile Scroll Fix for Modals */
-        .modal-content { background-color: #05101a; padding: 25px; border: 2px solid var(--primary-glow); border-radius: 10px; width: 100%; max-width: 450px; box-shadow: 0 0 30px var(--primary-glow); position: relative; display: flex; flex-direction: column; max-height: 85dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        .close-button { color: var(--text-color); position: absolute; top: 10px; right: 20px; font-size: 30px; font-weight: bold; cursor: pointer; z-index: 5; }
-        .modal-content img { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--primary-glow); display: block; margin: 0 auto 20px; object-fit: cover; }
-        .modal-content h2 { text-align: center; color: var(--primary-glow); margin-bottom: 20px; margin-top: 10px; }
-        .details p { margin: 10px 0; font-size: 1em; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-        .details span { color: var(--text-color); font-weight: normal; }
-        
-        .modal-actions { display: flex; justify-content: space-between; gap: 15px; margin-top: 25px; }
-        .action-btn { padding: 12px; border-radius: 5px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: bold; border: 1px solid var(--secondary-glow); background-color: transparent; color: var(--secondary-glow); flex-grow: 1; }
-        .delete-btn { border-color: var(--error-color); color: var(--error-color); }
-        
-        .floating-btn { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; border-radius: 50%; background-color: var(--primary-glow); color: var(--bg-color); font-size: 36px; line-height: 60px; text-align: center; border: none; box-shadow: 0 0 20px var(--primary-glow); cursor: pointer; transition: all 0.3s ease; z-index: 999; }
-
-        /* --- PRINT STYLES --- */
-        @media print {
-            @page { size: auto; margin: 10mm; }
-            body, html { height: auto; overflow: visible; background-color: white; color: black; }
-            #app-container { height: auto; overflow: visible; display: block; }
-            header, nav, #sign-out-btn, .logs-controls, .floating-btn, .sidebar, #roster-view, #command-center-view, #login-container { display: none !important; }
-            #logs-view { display: block !important; padding: 0; margin: 0; height: auto; }
-            .table-container { border: none; overflow: visible; }
-            #scan-log-table { width: 100%; border: 1px solid #000; color: #000; min-width: 0; }
-            #scan-log-table th { background-color: #eee; color: #000; border-bottom: 2px solid #000; position: static; }
-            #scan-log-table td { border-bottom: 1px solid #ccc; color: #000 !important; }
-            #scan-log-table tr:hover { background-color: transparent; }
-            .hidden { display: none; }
-            
-            /* Print Header */
-            #logs-view::before {
-                content: "T-FORCE SECURITY - SCAN LOG REPORT";
-                display: block;
-                font-size: 18pt;
-                font-weight: bold;
-                text-align: center;
-                margin-bottom: 20px;
-                font-family: sans-serif;
-            }
-        }
+        /* --- Logs --- */
+        .logs-controls { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px; margin-bottom: 20px; border: 1px solid var(--border-color); }
+        .print-btn { background: #333; color: white; border: 1px solid var(--border-color); padding: 10px 20px; cursor: pointer; font-weight: bold; font-family: 'Rajdhani', sans-serif; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { text-align: left; padding: 15px; background: #1a1a1a; color: var(--text-muted); border-bottom: 2px solid var(--primary-red); }
+        td { padding: 15px; border-bottom: 1px solid var(--border-color); color: white; }
     </style>
 </head>
 <body>
 
-    <div id="login-container"></div>
+    <!-- SINGLE ROOT FOR REACT -->
+    <div id="root"></div>
 
-    <div id="app-container" class="hidden">
-        <header>
-            <img src="https://placehold.co/150x50/030810/00d9ff?text=T-FORCE" alt="T-Force Security Logo" class="logo">
-            <h1>
-                <span class="title-red">T-FORCE</span>
-                <span class="title-white">COMMAND</span>
-            </h1>
-            <nav>
-                <button id="nav-roster-btn" class="nav-btn active">Personnel</button>
-                <button id="nav-map-btn" class="nav-btn">Live Map</button>
-                <button id="nav-logs-btn" class="nav-btn">Scan Logs</button>
-            </nav>
-            <button id="sign-out-btn">Sign Out</button>
-        </header>
+    <!-- 1. BRIDGE SCRIPT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, orderBy, limit, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-        <main id="main-content">
-            <div id="roster-view"></div> 
-            <div id="command-center-view" class="hidden"></div>
-            <div id="logs-view" class="hidden"></div>
-        </main>
-    </div>
-
-    <div id="modal" class="modal-container"></div>
-    <div id="add-modal" class="modal-container"></div>
-    <div id="edit-modal" class="modal-container"></div>
-    <div id="delete-confirm-modal" class="modal-container"></div>
-    
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-    
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpNklE0x2Mi-IY7_p_HhOH7_HcofPoUVw&callback=initMap"></script>
-    
-    <script type="text/babel">
-        function initializeCommandCenter() {
-            let reactRoot;
-            let unsubscribeLocations;
-
-            if (!reactRoot) {
-                    const container = document.getElementById('command-center-view');
-                    reactRoot = ReactDOM.createRoot(container);
-            }
-            
-            const CommandCenterApp = () => {
-                const [locations, setLocations] = React.useState([]);
-                const [selectedUser, setSelectedUser] = React.useState(null);
-
-                React.useEffect(() => {
-                    if (window.locationDb) {
-                        unsubscribeLocations = locationDb.collection('locations')
-                            .onSnapshot(snapshot => {
-                                const locationsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                                const onDutyLocations = locationsData.filter(loc => loc.onDuty !== false);
-                                onDutyLocations.sort((a, b) => (b.timestamp?.toDate ? b.timestamp.toDate().getTime() : 0) - (a.timestamp?.toDate ? a.timestamp.toDate().getTime() : 0));
-                                setLocations(onDutyLocations);
-                            }, error => console.error("Error fetching locations: ", error));
-                    }
-                    return () => { if(unsubscribeLocations) unsubscribeLocations(); };
-                }, []); 
-                
-                React.useEffect(() => {
-                    if (selectedUser && window.mapRef.current) {
-                        const userLocation = locations.find(loc => loc.id === selectedUser);
-                        if (userLocation && userLocation.latitude && userLocation.longitude) {
-                            window.mapRef.current.panTo({ lat: userLocation.latitude, lng: userLocation.longitude });
-                            window.mapRef.current.setZoom(17);
-                        }
-                    }
-                }, [selectedUser, locations]);
-
-                return (
-                    <React.Fragment>
-                        <Sidebar locations={locations} selectedUser={selectedUser} onSelectUser={setSelectedUser} />
-                        <MapContainer locations={locations} />
-                    </React.Fragment>
-                );
-            };
-
-            const Sidebar = ({ locations, selectedUser, onSelectUser }) => (
-                <div className="sidebar">
-                    <h2>Active Personnel ({locations.length})</h2>
-                    {locations.map(location => (
-                        <div key={location.id} className={`user-list-item ${selectedUser === location.id ? 'active' : ''}`} onClick={() => onSelectUser(location.id)}>
-                            <div className="user-name">{location.username}</div>
-                            <div className="user-timestamp">{location.timestamp && location.timestamp.toDate ? location.timestamp.toDate().toLocaleTimeString() : 'N/A'}</div>
-                        </div>
-                    ))}
-                </div>
-            );
-
-            const MapContainer = ({ locations }) => {
-                const googleMapRef = React.useRef(null);
-                const markersRef = React.useRef({});
-                
-                React.useEffect(() => {
-                    if (window.google && googleMapRef.current && !window.mapRef.current) {
-                            window.mapRef.current = new window.google.maps.Map(googleMapRef.current, {
-                            center: { lat: 37.4443, lng: 25.3289 },
-                            zoom: 12,
-                            mapTypeId: 'satellite'
-                        });
-                    }
-                }, []);
-
-                React.useEffect(() => {
-                    if (!window.mapRef.current) return;
-                    const currentMarkers = markersRef.current;
-                    const newMarkerIds = new Set();
-                    
-                    locations.forEach(location => {
-                        if (!location.latitude || !location.longitude) return;
-
-                        const position = { lat: location.latitude, lng: location.longitude };
-                        newMarkerIds.add(location.id);
-                        
-                        if(currentMarkers[location.id]) {
-                            currentMarkers[location.id].setPosition(position);
-                            const infoWindow = currentMarkers[location.id].infoWindow;
-                            if (infoWindow) {
-                                infoWindow.setContent(`<div><strong>${location.username}</strong><br/>Updated: ${location.timestamp && location.timestamp.toDate ? location.timestamp.toDate().toLocaleTimeString() : 'N/A'}</div>`);
-                            }
-                        } else {
-                            const marker = new window.google.maps.Marker({ position, map: window.mapRef.current, title: location.username });
-                            const infoWindow = new window.google.maps.InfoWindow({ content: `<div><strong>${location.username}</strong><br/>Updated: ${location.timestamp && location.timestamp.toDate ? location.timestamp.toDate().toLocaleTimeString() : 'N/A'}</div>` });
-                            marker.addListener('click', () => infoWindow.open(window.mapRef.current, marker));
-                            marker.infoWindow = infoWindow;
-                            currentMarkers[location.id] = marker;
-                        }
-                    });
-                    
-                    Object.keys(currentMarkers).forEach(markerId => {
-                        if (!newMarkerIds.has(markerId)) {
-                            currentMarkers[markerId].setMap(null);
-                            delete currentMarkers[markerId];
-                        }
-                    });
-                }, [locations]);
-
-                return <div ref={googleMapRef} className="map-container" />;
-            };
-           
-            if (document.getElementById('command-center-view')) {
-                 if (!reactRoot) {
-                    reactRoot = ReactDOM.createRoot(document.getElementById('command-center-view'));
-                 }
-                 reactRoot.render(<CommandCenterApp />);
-            }
-        }
-    </script>
-    
-    <script>
-        // --- Dual Firebase App Initialization ---
-        const personnelAppConfig = {
-            apiKey: "AIzaSyCK8r45XZyKNyvyJgnpFjp9uPzRD6KkVPk",
-            authDomain: "t-force-security.firebaseapp.com",
-            projectId: "t-force-security",
-            storageBucket: "t-force-security.appspot.com",
-            messagingSenderId: "170214179133",
-            appId: "1:170214179133:web:e3f7d0c304a55c689f0554"
-        };
-        const personnelApp = firebase.initializeApp(personnelAppConfig, 'personnelApp');
-
-        const locationAppConfig = {
+        const firebaseConfig = {
             apiKey: "AIzaSyBwhzGsK-ah7ObMOgpRDlzGghycLNinm6g",
             authDomain: "tforce-guardian-system.firebaseapp.com",
             projectId: "tforce-guardian-system",
-            storageBucket: "tforce-guardian-system.appspot.com",
+            storageBucket: "tforce-guardian-system.firebasestorage.app",
             messagingSenderId: "194168927826",
-            appId: "1:1G-FEXJ39F0RM:web:18073e1a188b8e4408118b"
-        };
-        const locationApp = firebase.initializeApp(locationAppConfig, 'locationApp');
-
-        const personnelAuth = personnelApp.auth();
-        const personnelDb = personnelApp.firestore();
-        const personnelStorage = personnelApp.storage();
-        
-        const locationDb = locationApp.firestore();
-        window.locationDb = locationDb; 
-        window.mapRef = { current: null }; 
-
-        // --- Global State ---
-        let activeView = 'roster';
-        let allPersonnel = [];
-        let allScanLogs = []; 
-        let currentEditingPerson = null;
-        let personToDelete = { docId: null, photoUrl: null };
-        let unsubscribePersonnel;
-        let unsubscribeLocations;
-        let unsubscribeScanLogs;
-        
-        // --- HTML Element Pointers ---
-        let loginContainer, appContainer, grid, statsContainer, searchBar, statusFilter;
-        let detailsModal, closeDetailsModalBtn, editBtn, deleteBtn, addPersonBtn;
-        let addModal, closeAddModalBtn, addPersonForm, addPhotoInput, addPhotoFileName;
-        let editModal, closeEditModalBtn, editPersonForm, editPhotoInput, editPhotoFileName;
-        let deleteConfirmModal, cancelDeleteBtn, confirmDeleteBtn;
-
-        function populateInitialHTML() {
-            loginContainer = document.getElementById('login-container');
-            appContainer = document.getElementById('app-container');
-
-            if (!loginContainer || !appContainer) return;
-
-            // 1. Login
-            loginContainer.innerHTML = `<div class="login-box"><img src="https://placehold.co/200x100/030810/00d9ff?text=T-FORCE" alt="T-Force Security Logo" class="logo"><h2>System Access</h2><form id="login-form"><input type="email" id="email-input" placeholder="Email" required><input type="password" id="password-input" placeholder="Password" required><button type="submit" class="save-btn">Authenticate</button></form><p id="login-error-message" class="error-message"></p></div>`;
-            
-            // 2. Roster
-            document.getElementById('roster-view').innerHTML = `<div id="stats-container" class="stats-container"></div><div class="controls-container"><input type="text" id="search-bar" placeholder="Search by name..."><select id="status-filter"><option value="all">All Personnel</option><option value="active">Active Only</option><option value="inactive">Inactive Only</option></select></div><div id="personnel-grid"></div><button id="add-person-btn" class="floating-btn">+</button>`;
-            
-            // 3. Logs (Updated with strict filtering and Print Button)
-            document.getElementById('logs-view').innerHTML = `
-                <div class="logs-controls">
-                    <div style="flex-grow: 1;">
-                        <label for="log-area-filter" style="display:block; margin-bottom:5px; color:var(--secondary-glow);">Filter by Area</label>
-                        <select id="log-area-filter">
-                            <option value="all">All Areas</option>
-                            <option value="apothiki56_group">Αποθήκη 56 (All Points)</option>
-                            <option value="ekali_group">Εκάλη (All Points)</option>
-                        </select>
-                    </div>
-                    <div style="flex-grow: 1;">
-                        <label for="log-month-filter" style="display:block; margin-bottom:5px; color:var(--secondary-glow);">Filter by Month</label>
-                        <input type="month" id="log-month-filter">
-                    </div>
-                    <button class="print-btn" onclick="window.print()">Print Report</button>
-                </div>
-                <div class="table-container">
-                    <table id="scan-log-table">
-                        <thead>
-                            <tr>
-                                <th>Timestamp</th>
-                                <th>Officer</th>
-                                <th>Checkpoint / Area</th>
-                            </tr>
-                        </thead>
-                        <tbody id="scan-log-tbody">
-                            </tbody>
-                    </table>
-                </div>
-            `;
-            
-            // 4. Modals
-            document.getElementById('modal').innerHTML = `<div class="modal-content"><span class="close-button">&times;</span><img id="modal-img" src="" alt="Personnel Photo"><h2 id="modal-name"></h2><div class="details"><p><strong>ID Number:</strong> <span id="modal-id"></span></p><p><strong>ΑΦΜ:</strong> <span id="modal-afm"></span></p><p><strong>ΑΜΚΑ:</strong> <span id="modal-amka"></span></p><p><strong>ΑΜΑ:</strong> <span id="modal-ama"></span></p><p><strong>Security ID:</strong> <span id="modal-sec-id"></span></p><p><strong>Phone:</strong> <span id="modal-phone"></span></p><p><strong>Hire Date:</strong> <span id="modal-hire-date"></span></p><p><strong>Assigned Location:</strong> <span id="modal-location"></span></p><p><strong>Emergency Contact:</strong> <span id="modal-emergency"></span></p><p><strong>Status:</strong> <span id="modal-status"></span></p></div><div class="modal-actions"><button id="edit-btn" class="action-btn">Edit</button><button id="delete-btn" class="action-btn delete-btn">Delete</button></div></div>`;
-            document.getElementById('add-modal').innerHTML = `<div class="modal-content"><span id="close-add-modal-btn" class="close-button">&times;</span><h2>Add New Personnel</h2><form id="add-person-form"><input type="text" id="name-input" placeholder="Full Name" required><input type="text" id="id-input" placeholder="ID Number" required><input type="text" id="afm-input" placeholder="ΑΦΜ" required><input type="text" id="amka-input" placeholder="ΑΜΚΑ" required><input type="text" id="ama-input" placeholder="ΑΜΑ" required><input type="text" id="sec-id-input" placeholder="Security ID" required><input type="tel" id="phone-input" placeholder="Phone Number" required><label for="hire-date-input" class="form-label">Hire Date</label><input type="date" id="hire-date-input" required><input type="text" id="location-input" placeholder="Assigned Location" required><input type="tel" id="emergency-input" placeholder="Emergency Contact Phone" required><div class="file-input-wrapper"><label for="photo-input" class="file-input-label">Choose Photo</label><input type="file" id="photo-input" class="file-input" accept="image/*" required><span id="photo-file-name" class="file-name-display">No file chosen</span></div><div class="status-toggle"><label for="status-input">Status:</label><select id="status-input"><option value="true">Active</option><option value="false">Inactive</option></select></div><button type="submit" class="save-btn">Save Personnel</button></form></div>`;
-            document.getElementById('edit-modal').innerHTML = `<div class="modal-content"><span id="close-edit-modal-btn" class="close-button">&times;</span><h2>Edit Personnel</h2><form id="edit-person-form"><input type="hidden" id="edit-doc-id"><input type="hidden" id="edit-current-photo-url"><input type="text" id="edit-name-input" placeholder="Full Name" required><input type="text" id="edit-id-input" placeholder="ID Number" required><input type="text" id="edit-afm-input" placeholder="ΑΦΜ" required><input type="text" id="edit-amka-input" placeholder="ΑΜΚΑ" required><input type="text" id="edit-ama-input" placeholder="ΑΜΑ" required><input type="text" id="edit-sec-id-input" placeholder="Security ID" required><input type="tel" id="edit-phone-input" placeholder="Phone Number" required><label for="edit-hire-date-input" class="form-label">Hire Date</label><input type="date" id="edit-hire-date-input" required><input type="text" id="edit-location-input" placeholder="Assigned Location" required><input type="tel" id="edit-emergency-input" placeholder="Emergency Contact Phone" required><div class="file-input-wrapper"><label for="edit-photo-input" class="file-input-label">Change Photo (Optional)</label><input type="file" id="edit-photo-input" class="file-input" accept="image/*"><span id="edit-photo-file-name" class="file-name-display">No new file chosen</span></div><div class="status-toggle"><label for="edit-status-input">Status:</label><select id="edit-status-input"><option value="true">Active</option><option value="false">Inactive</option></select></div><button type="submit" class="save-btn">Update Personnel</button></form></div>`;
-            document.getElementById('delete-confirm-modal').innerHTML = `<div class="modal-content"><h2>Confirm Deletion</h2><p>Are you sure you want to permanently delete this person? This action cannot be undone.</p><div class="modal-actions"><button id="cancel-delete-btn" class="action-btn">Cancel</button><button id="confirm-delete-btn" class="action-btn delete-btn">Confirm Delete</button></div></div>`;
-        
-            grid = document.getElementById('personnel-grid');
-            statsContainer = document.getElementById('stats-container');
-            searchBar = document.getElementById('search-bar');
-            statusFilter = document.getElementById('status-filter');
-            detailsModal = document.getElementById('modal');
-            closeDetailsModalBtn = detailsModal.querySelector('.close-button');
-            editBtn = document.getElementById('edit-btn');
-            deleteBtn = document.getElementById('delete-btn');
-            addPersonBtn = document.getElementById('add-person-btn');
-            addModal = document.getElementById('add-modal');
-            closeAddModalBtn = document.getElementById('close-add-modal-btn');
-            addPersonForm = document.getElementById('add-person-form');
-            addPhotoInput = document.getElementById('photo-input');
-            addPhotoFileName = document.getElementById('photo-file-name');
-            editModal = document.getElementById('edit-modal');
-            closeEditModalBtn = document.getElementById('close-edit-modal-btn');
-            editPersonForm = document.getElementById('edit-person-form');
-            editPhotoInput = document.getElementById('edit-photo-input');
-            editPhotoFileName = document.getElementById('edit-photo-file-name');
-            deleteConfirmModal = document.getElementById('delete-confirm-modal');
-            cancelDeleteBtn = document.getElementById('cancel-delete-btn');
-            confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-        }
-
-        function detachAllListeners() {
-            if (unsubscribePersonnel) unsubscribePersonnel();
-            if (unsubscribeLocations) unsubscribeLocations();
-            if (unsubscribeScanLogs) unsubscribeScanLogs();
-        }
-
-        function setupNavigation() {
-            const rosterBtn = document.getElementById('nav-roster-btn');
-            const mapBtn = document.getElementById('nav-map-btn');
-            const logsBtn = document.getElementById('nav-logs-btn');
-
-            rosterBtn.addEventListener('click', () => switchView('roster'));
-            mapBtn.addEventListener('click', () => switchView('map'));
-            logsBtn.addEventListener('click', () => switchView('logs'));
-        }
-
-        function switchView(viewName) {
-            detachAllListeners();
-            activeView = viewName;
-            
-            document.getElementById('nav-roster-btn').classList.toggle('active', viewName === 'roster');
-            document.getElementById('nav-map-btn').classList.toggle('active', viewName === 'map');
-            document.getElementById('nav-logs-btn').classList.toggle('active', viewName === 'logs');
-
-            document.getElementById('roster-view').classList.toggle('hidden', viewName !== 'roster');
-            document.getElementById('command-center-view').classList.toggle('hidden', viewName !== 'map');
-            document.getElementById('logs-view').classList.toggle('hidden', viewName !== 'logs');
-            
-            if (viewName === 'roster') { initializePersonnelRoster(); }
-            else if (viewName === 'map') { if (window.google) { initializeCommandCenter(); } }
-            else if (viewName === 'logs') { initializeScanLogs(); }
-        }
-
-        // --- Scan Log Functions ---
-        function initializeScanLogs() {
-            const tbody = document.getElementById('scan-log-tbody');
-            const areaFilter = document.getElementById('log-area-filter');
-            const monthFilter = document.getElementById('log-month-filter');
-
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = (now.getMonth() + 1).toString().padStart(2, '0');
-            monthFilter.value = `${year}-${month}`;
-
-            if (!tbody) return;
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Loading database records...</td></tr>';
-            
-            areaFilter.addEventListener('change', renderFilteredLogs);
-            monthFilter.addEventListener('change', renderFilteredLogs);
-
-            unsubscribeScanLogs = locationDb.collection('scan_logs')
-                .orderBy("timestamp", "desc")
-                .onSnapshot(snapshot => {
-                    if (snapshot.empty) {
-                        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No scan logs found.</td></tr>';
-                        allScanLogs = [];
-                        return;
-                    }
-                    
-                    // Filter OUT "Villa Main Gate" immediately upon fetching
-                    allScanLogs = [];
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        const area = data.checkpointData ? data.checkpointData : '';
-                        
-                        // STRICT EXCLUSION: Ignore Villa Main Gate
-                        if (area !== "Villa Main Gate") {
-                            allScanLogs.push(data);
-                        }
-                    });
-
-                    renderFilteredLogs();
-
-                }, error => {
-                    console.error("Error fetching scan logs: ", error);
-                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color: var(--error-color);">Error loading scan logs: ${error.message}</td></tr>`;
-                });
-        }
-
-        function renderFilteredLogs() {
-            const tbody = document.getElementById('scan-log-tbody');
-            const areaFilterValue = document.getElementById('log-area-filter').value;
-            const monthFilterValue = document.getElementById('log-month-filter').value;
-            
-            tbody.innerHTML = '';
-
-            const filteredLogs = allScanLogs.filter(log => {
-                const area = log.checkpointData || '';
-                
-                // 1. Filter by Area (Groups)
-                if (areaFilterValue !== 'all') {
-                    if (areaFilterValue === 'apothiki56_group') {
-                        // Check if string contains "Αποθήκη 56" OR "Apothiki 56"
-                        if (!area.includes("Αποθήκη 56") && !area.includes("Apothiki 56")) return false;
-                    } 
-                    else if (areaFilterValue === 'ekali_group') {
-                        // Check if string contains "Εκάλη" OR "Ekali"
-                        if (!area.includes("Εκάλη") && !area.includes("Ekali")) return false;
-                    }
-                }
-
-                // 2. Filter by Month
-                if (log.timestamp && log.timestamp.toDate) {
-                    const date = log.timestamp.toDate();
-                    const logYear = date.getFullYear();
-                    const logMonth = (date.getMonth() + 1).toString().padStart(2, '0');
-                    const logYm = `${logYear}-${logMonth}`;
-                    
-                    if (monthFilterValue && logYm !== monthFilterValue) {
-                        return false;
-                    }
-                }
-                
-                return true;
-            });
-
-            if (filteredLogs.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">No records found for this criteria.</td></tr>';
-                return;
-            }
-
-            filteredLogs.forEach(log => {
-                const tr = document.createElement('tr');
-                
-                let dateStr = 'Pending...';
-                if (log.timestamp && log.timestamp.toDate) {
-                    const d = log.timestamp.toDate();
-                    dateStr = d.toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                }
-
-                tr.innerHTML = `
-                    <td class="cell-timestamp">${dateStr}</td>
-                    <td class="cell-user">${log.username || 'Unknown User'}</td>
-                    <td class="cell-location">${log.checkpointData || 'No Data'}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        window.initMap = () => {
-                if (activeView === 'map') { initializeCommandCenter(); }
+            appId: "1:194168927826:web:18073e1a188b8e4408118b"
         };
 
-        // --- Personnel Roster Logic ---
-        function initializePersonnelRoster() {
-            const CLOUDINARY_CLOUD_NAME = "dhlrrefnc";
-            const CLOUDINARY_UPLOAD_PRESET = "nhprbmqn";
-            const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
-            
-            const personnelCollection = personnelDb.collection('personnel');
-            
-            function listenForPersonnelUpdates() {
-                unsubscribePersonnel = personnelCollection.orderBy("name").onSnapshot(snapshot => {
-                    allPersonnel = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderPersonnel();
-                    updateDashboardStats();
-                }, error => {
-                    grid.innerHTML = '<p class="no-results" style="color: var(--error-color);">Error loading personnel data.</p>';
-                });
-            }
-            
-            function renderPersonnel() {
-                const searchTerm = searchBar.value.toLowerCase();
-                const filterValue = statusFilter.value;
-
-                const filteredPersonnel = allPersonnel.filter(person => {
-                    const matchesSearch = person.name.toLowerCase().includes(searchTerm);
-                    const matchesFilter = filterValue === 'all' ||
-                        (filterValue === 'active' && person.isActive) ||
-                        (filterValue === 'inactive' && !person.isActive);
-                    return matchesSearch && matchesFilter;
-                });
-
-                grid.innerHTML = '';
-                if (filteredPersonnel.length === 0) {
-                    grid.innerHTML = '<p class="no-results">No personnel found.</p>';
-                    return;
-                }
-                
-                filteredPersonnel.forEach(person => {
-                    const card = document.createElement('div');
-                    card.className = 'personnel-card';
-                    card.innerHTML = `
-                        <img src="${person.photoUrl || 'https://placehold.co/100x100/030810/00d9ff?text=IMG'}" alt="${person.name}" onerror="this.src='https://placehold.co/100x100/030810/00d9ff?text=ERR'">
-                        <p>${person.name}</p>
-                    `;
-                    card.addEventListener('click', () => showDetailsModal(person));
-                    grid.appendChild(card);
-                });
-            }
-
-            function updateDashboardStats() {
-                const total = allPersonnel.length;
-                const active = allPersonnel.filter(p => p.isActive).length;
-                const inactive = total - active;
-                
-                statsContainer.innerHTML = `
-                    <div class="stat-card">
-                        <h3>Total Personnel</h3>
-                        <p>${total}</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Active Staff</h3>
-                        <p>${active}</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Inactive Staff</h3>
-                        <p>${inactive}</p>
-                    </div>`;
-            }
-
-            function showDetailsModal(person) {
-                currentEditingPerson = person;
-                document.getElementById('modal-img').src = person.photoUrl || 'https://placehold.co/150x150/030810/00d9ff?text=IMG';
-                document.getElementById('modal-name').textContent = person.name;
-                document.getElementById('modal-id').textContent = person.idNumber || 'N/A';
-                document.getElementById('modal-afm').textContent = person.afm || 'N/A';
-                document.getElementById('modal-amka').textContent = person.amka || 'N/A';
-                document.getElementById('modal-ama').textContent = person.ama || 'N/A';
-                document.getElementById('modal-sec-id').textContent = person.securityId || 'N/A';
-                document.getElementById('modal-phone').textContent = person.phoneNumber || 'N/A';
-                document.getElementById('modal-hire-date').textContent = person.hireDate || 'N/A';
-                document.getElementById('modal-location').textContent = person.assignedLocation || 'N/A';
-                document.getElementById('modal-emergency').textContent = person.emergencyContact || 'N/A';
-
-                const statusEl = document.getElementById('modal-status');
-                statusEl.textContent = person.isActive ? 'ACTIVE' : 'INACTIVE';
-                statusEl.style.color = person.isActive ? '#00ff88' : '#ff4d4d';
-                detailsModal.style.display = 'flex';
-            }
-            
-            async function uploadPhoto(file) {
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-
-                try {
-                    const response = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
-                    const data = await response.json();
-                    if (data.secure_url) return data.secure_url;
-                    throw new Error(data.error.message || 'Upload failed');
-                } catch (error) {
-                    alert('Image upload failed.');
-                    return null;
-                }
-            }
-
-            searchBar.addEventListener('input', renderPersonnel);
-            statusFilter.addEventListener('change', renderPersonnel);
-
-            closeDetailsModalBtn.addEventListener('click', () => detailsModal.style.display = 'none');
-            detailsModal.addEventListener('click', (e) => e.target === detailsModal && (detailsModal.style.display = 'none'));
-
-            addPersonBtn.addEventListener('click', () => {
-                addPersonForm.reset();
-                addPhotoFileName.textContent = 'No file chosen';
-                addModal.style.display = 'flex';
-            });
-            
-            addPhotoInput.addEventListener('change', () => {
-                addPhotoFileName.textContent = addPhotoInput.files[0] ? addPhotoInput.files[0].name : 'No file chosen';
-            });
-            
-            addPersonForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const submitBtn = e.target.querySelector('.save-btn');
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Saving...';
-                
-                const photoFile = addPhotoInput.files[0];
-                if (!photoFile) { alert("Photo is required."); submitBtn.disabled = false; submitBtn.textContent = 'Save Personnel'; return; }
-                const photoUrl = await uploadPhoto(photoFile);
-                if (!photoUrl) { submitBtn.disabled = false; submitBtn.textContent = 'Save Personnel'; return; }
-
-                const newPerson = {
-                    name: document.getElementById('name-input').value,
-                    idNumber: document.getElementById('id-input').value,
-                    afm: document.getElementById('afm-input').value,
-                    amka: document.getElementById('amka-input').value,
-                    ama: document.getElementById('ama-input').value,
-                    securityId: document.getElementById('sec-id-input').value,
-                    phoneNumber: document.getElementById('phone-input').value,
-                    hireDate: document.getElementById('hire-date-input').value,
-                    assignedLocation: document.getElementById('location-input').value,
-                    emergencyContact: document.getElementById('emergency-input').value,
-                    isActive: document.getElementById('status-input').value === 'true',
-                    photoUrl: photoUrl
-                };
-
-                try {
-                    await personnelCollection.add(newPerson);
-                    addModal.style.display = 'none';
-                } catch (error) {
-                    alert("Error: " + error.message);
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Save Personnel';
-                }
-            });
-            
-            closeAddModalBtn.addEventListener('click', () => addModal.style.display = 'none');
-            addModal.addEventListener('click', (e) => e.target === addModal && (addModal.style.display = 'none'));
-            
-            editBtn.addEventListener('click', () => {
-                if (!currentEditingPerson) return;
-                detailsModal.style.display = 'none';
-                document.getElementById('edit-doc-id').value = currentEditingPerson.id;
-                document.getElementById('edit-current-photo-url').value = currentEditingPerson.photoUrl;
-                document.getElementById('edit-name-input').value = currentEditingPerson.name;
-                document.getElementById('edit-id-input').value = currentEditingPerson.idNumber || '';
-                document.getElementById('edit-afm-input').value = currentEditingPerson.afm || '';
-                document.getElementById('edit-amka-input').value = currentEditingPerson.amka || '';
-                document.getElementById('edit-ama-input').value = currentEditingPerson.ama || '';
-                document.getElementById('edit-sec-id-input').value = currentEditingPerson.securityId || '';
-                document.getElementById('edit-phone-input').value = currentEditingPerson.phoneNumber || '';
-                document.getElementById('edit-hire-date-input').value = currentEditingPerson.hireDate || '';
-                document.getElementById('edit-location-input').value = currentEditingPerson.assignedLocation || '';
-                document.getElementById('edit-emergency-input').value = currentEditingPerson.emergencyContact || '';
-                document.getElementById('edit-status-input').value = String(currentEditingPerson.isActive);
-                editPhotoInput.value = '';
-                editPhotoFileName.textContent = 'No new file chosen';
-                editModal.style.display = 'flex';
-            });
-
-            editPhotoInput.addEventListener('change', () => {
-                editPhotoFileName.textContent = editPhotoInput.files[0] ? editPhotoInput.files[0].name : 'No new file chosen';
-            });
-
-            editPersonForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const submitBtn = e.target.querySelector('.save-btn');
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Updating...';
-
-                let updatedPhotoUrl = document.getElementById('edit-current-photo-url').value;
-                const photoFile = editPhotoInput.files[0];
-                if (photoFile) {
-                    updatedPhotoUrl = await uploadPhoto(photoFile);
-                    if (!updatedPhotoUrl) { submitBtn.disabled = false; submitBtn.textContent = 'Update Personnel'; return; }
-                }
-                
-                const docId = document.getElementById('edit-doc-id').value;
-                const updatedPerson = {
-                    name: document.getElementById('edit-name-input').value,
-                    idNumber: document.getElementById('edit-id-input').value,
-                    afm: document.getElementById('edit-afm-input').value,
-                    amka: document.getElementById('edit-amka-input').value,
-                    ama: document.getElementById('edit-ama-input').value,
-                    securityId: document.getElementById('edit-sec-id-input').value,
-                    phoneNumber: document.getElementById('edit-phone-input').value,
-                    hireDate: document.getElementById('edit-hire-date-input').value,
-                    assignedLocation: document.getElementById('edit-location-input').value,
-                    emergencyContact: document.getElementById('edit-emergency-input').value,
-                    isActive: document.getElementById('edit-status-input').value === 'true',
-                    photoUrl: updatedPhotoUrl
-                };
-
-                try {
-                    await personnelCollection.doc(docId).update(updatedPerson);
-                    editModal.style.display = 'none';
-                } catch (error) {
-                    alert("Error: " + error.message);
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Update Personnel';
-                }
-            });
-
-            closeEditModalBtn.addEventListener('click', () => editModal.style.display = 'none');
-            editModal.addEventListener('click', (e) => e.target === editModal && (editModal.style.display = 'none'));
-            
-            deleteBtn.addEventListener('click', () => {
-                if (!currentEditingPerson) return;
-                personToDelete.docId = currentEditingPerson.id;
-                personToDelete.photoUrl = currentEditingPerson.photoUrl;
-                detailsModal.style.display = 'none';
-                deleteConfirmModal.style.display = 'flex';
-            });
-
-            cancelDeleteBtn.addEventListener('click', () => deleteConfirmModal.style.display = 'none');
-            deleteConfirmModal.addEventListener('click', (e) => e.target === deleteConfirmModal && (deleteConfirmModal.style.display = 'none'));
-            
-            confirmDeleteBtn.addEventListener('click', async () => {
-                if (!personToDelete.docId) return;
-                try {
-                    await personnelCollection.doc(personToDelete.docId).delete();
-                    deleteConfirmModal.style.display = 'none';
-                } catch (error) {
-                    alert("Error: " + error.message);
-                }
-            });
-            
-            listenForPersonnelUpdates();
+        try {
+            const app = initializeApp(firebaseConfig);
+            window.fbAuth = getAuth(app);
+            window.fbDb = getFirestore(app);
+            window.fbFuncs = { onAuthStateChanged, signInWithEmailAndPassword, signOut, collection, onSnapshot, orderBy, limit, doc, setDoc };
+            // Signal Ready
+            window.dispatchEvent(new Event('firebase-ready'));
+        } catch (e) {
+            console.error("Firebase Init Error:", e);
         }
+    </script>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            populateInitialHTML();
+    <!-- 2. REACT DEP -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- 3. APP LOGIC -->
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // SAFE DATE FORMATTER
+        const fmtDate = (ts) => {
+            if(!ts || !ts.toDate) return "PENDING...";
+            try { return ts.toDate().toLocaleTimeString(); } catch(e) { return "ERR"; }
+        };
+
+        // LOGIN COMPONENT
+        const Login = () => {
+            const [email, setEmail] = useState("");
+            const [pass, setPass] = useState("");
             
-            personnelAuth.onAuthStateChanged(user => {
-                if (user) {
-                    if (loginContainer) loginContainer.classList.add('hidden');
-                    if (appContainer) appContainer.classList.remove('hidden');
-                    setupNavigation();
-                    switchView('roster');
-                } else {
-                    if (appContainer) appContainer.classList.add('hidden');
-                    if (loginContainer) loginContainer.classList.remove('hidden');
-                    detachAllListeners();
-                }
-            });
-            
-            const loginForm = document.getElementById('login-form');
-            loginForm.addEventListener('submit', (e) => {
+            const handleLogin = (e) => {
                 e.preventDefault();
-                const email = document.getElementById('email-input').value;
-                const password = document.getElementById('password-input').value;
-                personnelAuth.signInWithEmailAndPassword(email, password)
-                    .catch(error => {
-                        document.getElementById('login-error-message').textContent = error.message;
-                    });
-            });
+                window.fbFuncs.signInWithEmailAndPassword(window.fbAuth, email, pass).catch(err => alert(err.message));
+            };
 
-            document.getElementById('sign-out-btn').addEventListener('click', () => {
-                personnelAuth.signOut();
-            });
-        });
+            return (
+                <div className="login-container">
+                    <div className="login-box">
+                        <h2>SECURE LOGIN</h2>
+                        <form onSubmit={handleLogin}>
+                            <input className="login-input" type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required />
+                            <input className="login-input" type="password" placeholder="Password" value={pass} onChange={e=>setPass(e.target.value)} required />
+                            <button type="submit" className="save-btn">AUTHENTICATE</button>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // DASHBOARD COMPONENT
+        const Dashboard = ({ user }) => {
+            const [view, setView] = useState('live');
+            const [units, setUnits] = useState([]);
+            const [logs, setLogs] = useState([]);
+
+            // Live Feed Listener
+            useEffect(() => {
+                if(view !== 'live') return;
+                const { collection, onSnapshot } = window.fbFuncs;
+                const unsub = onSnapshot(collection(window.fbDb, 'locations'), snap => {
+                    const data = snap.docs.map(d => ({id:d.id, ...d.data()}));
+                    const now = new Date();
+                    const active = data.filter(u => {
+                        if(!u.timestamp || !u.timestamp.toDate) return false;
+                        const diff = (now - u.timestamp.toDate()) / 1000 / 60;
+                        return u.onDuty && diff < 60;
+                    });
+                    setUnits(active);
+                });
+                return () => unsub();
+            }, [view]);
+
+            // Logs Listener
+            useEffect(() => {
+                if(view !== 'logs') return;
+                const { collection, onSnapshot } = window.fbFuncs;
+                // Simplified query to avoid index errors initially
+                const unsub = onSnapshot(collection(window.fbDb, 'scan_logs'), snap => {
+                    let data = snap.docs.map(d => ({id:d.id, ...d.data()}));
+                    // Manual Sort
+                    data.sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+                    setLogs(data.slice(0, 50));
+                });
+                return () => unsub();
+            }, [view]);
+
+            return (
+                <div className="app-container">
+                    <header>
+                        <h1><span className="title-red">T-FORCE</span> <span style={{color:'white'}}>COMMAND</span></h1>
+                        <nav>
+                            <button className={`nav-btn ${view==='live'?'active':''}`} onClick={()=>setView('live')}>ACTIVE UNITS</button>
+                            <button className={`nav-btn ${view==='logs'?'active':''}`} onClick={()=>setView('logs')}>SCAN LOGS</button>
+                        </nav>
+                        <button className="sign-out-btn" onClick={() => window.fbFuncs.signOut(window.fbAuth)}>SIGN OUT</button>
+                    </header>
+
+                    <main>
+                        {view === 'live' && (
+                            <div className="live-grid">
+                                {units.length === 0 && <p style={{color:'#666', textAlign:'center', gridColumn:'1/-1', marginTop:'50px', fontSize:'20px'}}>NO ACTIVE UNITS</p>}
+                                {units.map(u => (
+                                    <div key={u.id} className="live-card">
+                                        <h3>{u.username}</h3>
+                                        <p className="status">● ON DUTY</p>
+                                        <p>Last Signal: {fmtDate(u.timestamp)}</p>
+                                        <code className="coords">{u.latitude?.toFixed(5)}, {u.longitude?.toFixed(5)}</code>
+                                        <a href={`https://www.google.com/maps?q=${u.latitude},${u.longitude}`} target="_blank" style={{color:'#dc2626', display:'block', marginTop:'10px', textAlign:'right', textDecoration:'none', fontWeight:'bold'}}>OPEN MAP &rarr;</a>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {view === 'logs' && (
+                            <div>
+                                <div className="logs-controls">
+                                    <h3 style={{color:'#dc2626', margin:0}}>CHECKPOINT LOGS</h3>
+                                    <button className="print-btn" onClick={()=>window.print()}>PRINT REPORT</button>
+                                </div>
+                                <div style={{overflowX:'auto', border:'1px solid #333'}}>
+                                    <table>
+                                        <thead><tr><th>TIME</th><th>OFFICER</th><th>LOCATION</th></tr></thead>
+                                        <tbody>
+                                            {logs.map(l => (
+                                                <tr key={l.id}>
+                                                    <td style={{fontFamily:'monospace', color:'#9ca3af'}}>{fmtDate(l.timestamp)}</td>
+                                                    <td style={{fontWeight:'bold'}}>{l.username}</td>
+                                                    <td>{l.checkpointData}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+                </div>
+            );
+        };
+
+        // ROOT CONTROLLER
+        const Main = () => {
+            const [user, setUser] = useState(null);
+            const [ready, setReady] = useState(false);
+
+            useEffect(() => {
+                const init = () => {
+                    if(window.fbFuncs && window.fbAuth) {
+                        window.fbFuncs.onAuthStateChanged(window.fbAuth, (u) => {
+                            setUser(u);
+                            setReady(true);
+                        });
+                    }
+                };
+                
+                // If firebase loads faster than react
+                if(window.fbAuth) init();
+                // If react loads faster than firebase
+                window.addEventListener('firebase-ready', init);
+                
+                return () => window.removeEventListener('firebase-ready', init);
+            }, []);
+
+            if(!ready) return <div style={{color:'#dc2626', display:'flex', justifyContent:'center', alignItems:'center', height:'100vh', fontSize:'24px', letterSpacing:'2px'}}>INITIALIZING SYSTEM...</div>;
+            
+            return user ? <Dashboard user={user} /> : <Login />;
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<Main />);
     </script>
 </body>
 </html>
