@@ -37,13 +37,31 @@
         
         /* --- CORE LAYOUT LOCK --- */
         html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Rajdhani', sans-serif; display: flex; justify-content: center; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Rajdhani', sans-serif; }
         
-        #root { width: 100%; max-width: 1024px; height: 100%; display: flex; flex-direction: column; background-color: var(--bg-color); position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+        #root { 
+            width: 100%; 
+            max-width: 1024px; 
+            height: 100%; 
+            margin: 0 auto;
+            background-color: var(--bg-color); 
+            box-shadow: 0 0 50px rgba(0,0,0,0.5); 
+            display: flex; 
+            flex-direction: column;
+        }
         .hidden { display: none !important; }
         
-        /* HEADER (Fixed Height) */
-        header { flex: 0 0 auto; padding: 15px 20px; background-color: rgba(0, 0, 0, 0.95); border-bottom: 2px solid var(--primary-red); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        /* HEADER (Fixed) */
+        header { 
+            flex: 0 0 80px; 
+            padding: 0 20px; 
+            background-color: rgba(0, 0, 0, 0.95); 
+            border-bottom: 2px solid var(--primary-red); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            z-index: 100; 
+        }
         header h1 { margin: 0; font-size: 1.5em; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
         .title-red { color: var(--primary-red); }
         
@@ -55,24 +73,59 @@
         .nav-btn { padding: 8px 16px; background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-muted); font-family: 'Rajdhani', sans-serif; cursor: pointer; font-weight: 600; text-transform: uppercase; border-radius: 2px; }
         .nav-btn.active { background-color: var(--primary-red); color: white; border-color: var(--primary-red); }
         
-        /* MAIN LAYOUT CONTAINER (Fills remaining space) */
+        /* MAIN LAYOUT CONTAINER */
         main { 
-            flex: 1 1 auto; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; /* Prevents main from scrolling, inner containers scroll instead */
-            padding: 20px; 
-            min-height: 0; /* Crucial for Flexbox scrolling */
+            flex: 1; 
+            position: relative;
+            overflow: hidden; 
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
         }
         
-        /* VIEW CONTAINERS */
-        #live-view, #logs-view {
+        /* VIEW WRAPPER */
+        .view-wrapper {
             height: 100%;
             display: flex;
             flex-direction: column;
-            min-height: 0; /* Crucial */
+            overflow: hidden;
         }
 
+        /* --- LOGS VIEW SPECIFIC --- */
+        .logs-controls { 
+            flex: 0 0 auto; 
+            display: flex; 
+            gap: 10px; 
+            align-items: flex-end; 
+            flex-wrap: wrap; 
+            margin-bottom: 20px; 
+            background-color: var(--card-bg); 
+            padding: 15px; 
+            border: 1px solid var(--border-color); 
+        }
+        
+        .filter-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 150px; }
+        .filter-label { color: var(--primary-red); font-size: 12px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+        .filter-select { background: #000; color: white; border: 1px solid var(--border-color); padding: 10px; font-family: 'Rajdhani', sans-serif; border-radius: 2px; width: 100%; height: 40px; }
+        
+        .print-btn { background: #333; color: white; border: 1px solid var(--border-color); padding: 0 20px; cursor: pointer; font-weight: bold; font-family: 'Rajdhani', sans-serif; height: 40px; margin-bottom: 0; }
+        .print-btn:hover { background: var(--primary-red); border-color: var(--primary-red); }
+
+        /* TABLE SCROLL AREA */
+        .table-wrapper { 
+            flex: 1; 
+            overflow-y: scroll; /* FORCE SCROLLBAR */
+            border: 1px solid var(--border-color); 
+            background: #000; 
+            position: relative; 
+            min-height: 0; 
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { text-align: left; padding: 15px; background: #1a1a1a; color: var(--text-muted); border-bottom: 2px solid var(--primary-red); position: sticky; top: 0; z-index: 10; }
+        td { text-align: left; padding: 15px; border-bottom: 1px solid var(--border-color); color: white; }
+        
         /* --- LOGIN --- */
         .login-container { display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; }
         .login-box { background: var(--card-bg); padding: 40px; border: 1px solid var(--border-color); width: 90%; max-width: 400px; text-align: center; border-radius: 4px; }
@@ -95,74 +148,14 @@
         .status { color: var(--success-color); font-weight: bold; }
         .coords { font-family: monospace; color: var(--primary-red); background: #000; padding: 8px; display: block; margin-top: 15px; border: 1px solid var(--border-color); text-align: center; }
         
-        /* --- LOGS VIEW --- */
-        .logs-container { 
-            display: flex; 
-            flex-direction: column; 
-            height: 100%; 
-            min-height: 0; 
-        }
-        
-        .logs-controls { 
-            flex: 0 0 auto; /* Don't shrink */
-            display: flex; 
-            gap: 10px; 
-            align-items: flex-end; 
-            flex-wrap: wrap; 
-            margin-bottom: 20px; 
-            background-color: var(--card-bg); 
-            padding: 15px; 
-            border: 1px solid var(--border-color); 
-        }
-        
-        .filter-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 150px; }
-        .filter-label { color: var(--primary-red); font-size: 12px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
-        .filter-select { background: #000; color: white; border: 1px solid var(--border-color); padding: 10px; font-family: 'Rajdhani', sans-serif; border-radius: 2px; width: 100%; height: 40px; }
-        
-        .print-btn { background: #333; color: white; border: 1px solid var(--border-color); padding: 0 20px; cursor: pointer; font-weight: bold; font-family: 'Rajdhani', sans-serif; height: 40px; margin-bottom: 0; }
-        .print-btn:hover { background: var(--primary-red); border-color: var(--primary-red); }
-
-        /* TABLE WRAPPER - THE SCROLL ENGINE */
-        .table-wrapper { 
-            flex: 1 1 auto; /* Take all remaining space */
-            overflow-y: scroll; /* FORCE SCROLLBAR */
-            border: 1px solid var(--border-color); 
-            background: #000; 
-            position: relative; 
-            min-height: 0; /* Critical for nested flex scroll */
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th { text-align: left; padding: 15px; background: #1a1a1a; color: var(--text-muted); border-bottom: 2px solid var(--primary-red); position: sticky; top: 0; z-index: 10; }
-        td { text-align: left; padding: 15px; border-bottom: 1px solid var(--border-color); color: white; }
-        
-        /* --- AGGRESSIVE PERMANENT SCROLLBAR STYLING --- */
-        /* Works on Chrome, Edge, Safari, Android Webview */
-        
-        ::-webkit-scrollbar { 
-            width: 16px; /* Wide enough to hit with a thumb */
-            height: 16px;
-            display: block !important; 
-        }
-        ::-webkit-scrollbar-track { 
-            background: #111; 
-            border-left: 1px solid #333;
-        }
-        ::-webkit-scrollbar-thumb { 
-            background-color: var(--primary-red); 
-            border-radius: 2px; 
-            border: 3px solid #111; /* Creates a gap for visual separation */
-        }
-        ::-webkit-scrollbar-thumb:hover { 
-            background-color: #ff0000; 
-        }
+        /* --- SCROLLBAR STYLING --- */
+        ::-webkit-scrollbar { width: 16px; height: 16px; display: block !important; background: #000; }
+        ::-webkit-scrollbar-track { background: #111; border-left: 1px solid #333; }
+        ::-webkit-scrollbar-thumb { background-color: var(--primary-red); border-radius: 2px; border: 3px solid #111; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #ff0000; }
         
         /* Firefox */
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: var(--primary-red) #111;
-        }
+        * { scrollbar-width: thin; scrollbar-color: var(--primary-red) #111; }
     </style>
 </head>
 <body>
@@ -170,13 +163,14 @@
     <div id="root"></div>
 
     <script>
+        // Crash Handler
         window.onerror = function(message, source, lineno, colno, error) {
             document.body.innerHTML = `<div style="padding:20px; color:red; background:black; font-family:monospace;">SYSTEM FAILURE: ${message} (Line ${lineno})</div>`;
         };
     </script>
     
     <script type="text/babel">
-        // --- INIT FIREBASE ---
+        // --- INIT FIREBASE COMPAT ---
         const firebaseConfig = {
             apiKey: "AIzaSyBwhzGsK-ah7ObMOgpRDlzGghycLNinm6g", 
             authDomain: "tforce-guardian-system.firebaseapp.com",
@@ -255,17 +249,19 @@
             }, []);
 
             return (
-                <div className="live-grid">
-                    {units.length === 0 && <p style={{gridColumn: '1/-1', textAlign:'center', color:'#666', fontSize:'1.2em', marginTop:'50px'}}>NO ACTIVE UNITS DETECTED</p>}
-                    {units.map(unit => (
-                        <div key={unit.id} className="live-card">
-                            <h3>{unit.username}</h3>
-                            <p className="status">● ON DUTY</p>
-                            <p>Last Signal: {formatLastSignal(unit.timestamp)}</p>
-                            <code className="coords">{unit.latitude ? unit.latitude.toFixed(5) : '0.0000'}, {unit.longitude ? unit.longitude.toFixed(5) : '0.0000'}</code>
-                            <a href={`https://www.google.com/maps?q=${unit.latitude},${unit.longitude}`} target="_blank" style={{color:'#dc2626', textDecoration:'none', display:'block', marginTop:'15px', fontSize:'0.9em', fontWeight:'bold', textAlign:'right'}}>OPEN MAP &rarr;</a>
-                        </div>
-                    ))}
+                <div className="view-wrapper">
+                    <div className="live-grid">
+                        {units.length === 0 && <p style={{gridColumn: '1/-1', textAlign:'center', color:'#666', fontSize:'1.2em', marginTop:'50px'}}>NO ACTIVE UNITS DETECTED</p>}
+                        {units.map(unit => (
+                            <div key={unit.id} className="live-card">
+                                <h3>{unit.username}</h3>
+                                <p className="status">● ON DUTY</p>
+                                <p>Last Signal: {formatLastSignal(unit.timestamp)}</p>
+                                <code className="coords">{unit.latitude ? unit.latitude.toFixed(5) : '0.0000'}, {unit.longitude ? unit.longitude.toFixed(5) : '0.0000'}</code>
+                                <a href={`https://www.google.com/maps?q=${unit.latitude},${unit.longitude}`} target="_blank" style={{color:'#dc2626', textDecoration:'none', display:'block', marginTop:'15px', fontSize:'0.9em', fontWeight:'bold', textAlign:'right'}}>OPEN MAP &rarr;</a>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             );
         };
@@ -322,7 +318,7 @@
             });
 
             return (
-                <div className="logs-container">
+                <div className="view-wrapper">
                     <div className="logs-controls">
                         <div className="filter-group">
                             <label className="filter-label">FILTER BY AREA</label>
@@ -384,7 +380,7 @@
             if (!user) return <Login />;
 
             return (
-                <div id="app-container">
+                <div id="root">
                     <header>
                         <h1><span className="title-red">T-FORCE</span> <span style={{color:'white'}}>COMMAND</span></h1>
                         <nav>
@@ -395,12 +391,8 @@
                     </header>
 
                     <main>
-                        <div id="live-view" style={{display: view === 'live' ? 'block' : 'none', height: '100%'}}>
-                            <LiveFeed />
-                        </div>
-                        <div id="logs-view" style={{display: view === 'logs' ? 'block' : 'none', height: '100%'}}>
-                            <ScanLogs />
-                        </div>
+                        {view === 'live' && <LiveFeed />}
+                        {view === 'logs' && <ScanLogs />}
                     </main>
                 </div>
             );
