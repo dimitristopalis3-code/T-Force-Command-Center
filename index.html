@@ -31,6 +31,7 @@
             --border-color: #333333; 
             --success-color: #22c55e; 
             --accent-cyan: #06b6d4; 
+            --gold-alert: #FFD700; /* New Gold Color */
         }
         
         /* --- CORE LAYOUT --- */
@@ -89,7 +90,7 @@
         input, select { background: #000; color: white; border: 1px solid var(--border-color); padding: 10px; font-family: 'Rajdhani', sans-serif; border-radius: 2px; width: 100%; box-sizing: border-box; }
         input:focus, select:focus { outline: none; border-color: var(--primary-red); }
 
-        /* LOGS FILTERS (RESTORED) */
+        /* LOGS FILTERS */
         .logs-controls { flex: 0 0 auto; display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 20px; background-color: var(--card-bg); padding: 15px; border: 1px solid var(--border-color); }
         .filter-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 150px; }
         .filter-label { color: var(--primary-red); font-size: 12px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
@@ -100,8 +101,42 @@
         /* ROSTER STYLES */
         .roster-container { overflow-y: auto; height: 100%; padding-right: 10px; position: relative; }
         .day-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
-        .day-tab { padding: 8px 16px; background: #000; border: 1px solid var(--border-color); color: var(--text-muted); font-family: 'Rajdhani', sans-serif; font-weight: bold; cursor: pointer; flex: 1; text-align: center; min-width: 60px; }
-        .day-tab.active { background: var(--border-color); color: white; border-color: var(--text-muted); }
+        
+        .day-tab { 
+            padding: 8px 16px; 
+            background: #000; 
+            border: 1px solid var(--border-color); 
+            color: var(--text-muted); 
+            font-family: 'Rajdhani', sans-serif; 
+            font-weight: bold; 
+            cursor: pointer; 
+            flex: 1; 
+            text-align: center; 
+            min-width: 60px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* The Selected Day (The "Grey Box") */
+        .day-tab.active { 
+            background: var(--border-color); 
+            color: white; 
+            border-color: var(--text-muted); 
+        }
+
+        /* The Actual Current Day (The "Golden Border") */
+        .day-tab.current-day {
+            border: 2px solid var(--gold-alert) !important;
+            color: var(--gold-alert) !important;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+            z-index: 10;
+        }
+
+        /* Combined: If selected AND current */
+        .day-tab.active.current-day {
+            background: #1a1a00; /* Slight gold tint to background */
+        }
+
         .time-block { margin-bottom: 40px; }
         .time-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
         .time-badge { background: var(--primary-red); color: white; padding: 5px 12px; font-size: 1.2em; font-weight: 700; border-radius: 2px; }
@@ -241,21 +276,35 @@
         const RosterPanel = () => {
             const [people, setPeople] = useState([]);
             const [editMode, setEditMode] = useState(false);
-            const [selectedDay, setSelectedDay] = useState(() => {
+            
+            // LOGIC: Determine Current Real Day
+            const getCurrentDayName = () => {
                 const d = new Date().getDay();
-                return d === 0 ? "MONDAY" : DAYS[d-1]; 
-            });
+                return d === 0 ? "SUNDAY" : DAYS[d-1]; 
+            };
+            const [currentRealDay, setCurrentRealDay] = useState(getCurrentDayName());
+
+            // LOGIC: Selected Day (Defaults to Current Real Day)
+            const [selectedDay, setSelectedDay] = useState(getCurrentDayName());
 
             const [showModal, setShowModal] = useState(false);
             const [editingId, setEditingId] = useState(null);
             const [formData, setFormData] = useState({ name: '', role: '', img: '', schedule: {} });
 
             useEffect(() => {
+                // Update "Real Day" periodically just in case user keeps app open over midnight
+                const interval = setInterval(() => {
+                    setCurrentRealDay(getCurrentDayName());
+                }, 60000);
+
                 const unsub = db.collection('roster').onSnapshot(snap => {
                     const data = snap.docs.map(d => ({id: d.id, ...d.data()}));
                     setPeople(data);
                 });
-                return () => unsub();
+                return () => {
+                    clearInterval(interval);
+                    unsub();
+                };
             }, []);
 
             const handleEdit = (person) => {
@@ -316,7 +365,11 @@
                     <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'15px'}}>
                         <div className="day-tabs" style={{marginBottom:0, borderBottom:'none'}}>
                             {DAYS.filter(d=>d!=="SUNDAY").map(day => (
-                                <div key={day} className={`day-tab ${selectedDay===day?'active':''}`} onClick={()=>setSelectedDay(day)}>
+                                <div 
+                                    key={day} 
+                                    className={`day-tab ${selectedDay === day ? 'active' : ''} ${day === currentRealDay ? 'current-day' : ''}`}
+                                    onClick={() => setSelectedDay(day)}
+                                >
                                     {day.substring(0,3)}
                                 </div>
                             ))}
@@ -338,7 +391,12 @@
 
                     <div className="roster-content">
                         {sortedTimes.length === 0 ? (
-                            <div style={{textAlign:'center', padding:'50px', color:'#666'}}>NO SHIFTS SCHEDULED FOR {selectedDay}</div>
+                            <div style={{textAlign:'center', padding:'50px', color:'#666'}}>
+                                {selectedDay === currentRealDay ? 
+                                    `NO SHIFTS SCHEDULED FOR TODAY (${selectedDay})` : 
+                                    `NO SHIFTS SCHEDULED FOR ${selectedDay}`
+                                }
+                            </div>
                         ) : (
                             sortedTimes.map(time => (
                                 <div key={time} className="time-block">
