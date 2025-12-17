@@ -11,15 +11,12 @@
     
     <meta name="theme-color" content="#000000"/>
 
-    <!-- SECURITY: CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://generativelanguage.googleapis.com https://en.wikipedia.org https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com; img-src 'self' data: https: blob:;">
 
-    <!-- STABILITY: React 17 Legacy Core -->
     <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- FIREBASE COMPAT SDKS -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -33,6 +30,7 @@
             --text-muted: #9ca3af; 
             --border-color: #333333; 
             --success-color: #22c55e; 
+            --accent-cyan: #06b6d4; /* New accent for Roster */
         }
         
         /* --- CORE LAYOUT LOCK --- */
@@ -126,6 +124,71 @@
         th { text-align: left; padding: 15px; background: #1a1a1a; color: var(--text-muted); border-bottom: 2px solid var(--primary-red); position: sticky; top: 0; z-index: 10; }
         td { text-align: left; padding: 15px; border-bottom: 1px solid var(--border-color); color: white; }
         
+        /* ROSTER STYLES */
+        .roster-container { overflow-y: auto; height: 100%; padding-right: 10px; }
+        .day-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        .day-tab { 
+            padding: 8px 16px; 
+            background: #000; 
+            border: 1px solid var(--border-color); 
+            color: var(--text-muted); 
+            font-family: 'Rajdhani', sans-serif; 
+            font-weight: bold; 
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            min-width: 80px;
+        }
+        .day-tab.active { background: var(--border-color); color: white; border-color: var(--text-muted); }
+        
+        .time-block { margin-bottom: 40px; }
+        .time-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            margin-bottom: 20px; 
+        }
+        .time-badge { 
+            background: var(--primary-red); 
+            color: white; 
+            padding: 5px 12px; 
+            font-size: 1.2em; 
+            font-weight: 700; 
+            border-radius: 2px; 
+        }
+        .time-line { flex: 1; height: 1px; background: var(--border-color); }
+        
+        .roster-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            gap: 20px; 
+        }
+        .roster-card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border-color); 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .roster-card:hover { border-color: var(--text-muted); }
+        .qr-frame { 
+            width: 100%; 
+            aspect-ratio: 1/1; 
+            background: white; 
+            padding: 5px; 
+            margin-bottom: 15px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden;
+        }
+        .qr-frame img { width: 100%; height: 100%; object-fit: contain; }
+        .emp-name { font-size: 1.1em; font-weight: 700; color: white; margin-bottom: 5px; }
+        .emp-role { font-size: 0.85em; color: var(--primary-red); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; }
+
         /* LOGIN */
         .login-container { display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; }
         .login-box { background: var(--card-bg); padding: 40px; border: 1px solid var(--border-color); width: 90%; max-width: 400px; text-align: center; border-radius: 4px; }
@@ -158,8 +221,8 @@
                 color: black !important;
             }
 
-            /* HIDE UI */
-            header, nav, .logs-controls, .live-grid, .sign-out-btn, ::-webkit-scrollbar {
+            /* HIDE UI & ROSTER */
+            header, nav, .logs-controls, .live-grid, .sign-out-btn, ::-webkit-scrollbar, .roster-container {
                 display: none !important;
             }
 
@@ -225,6 +288,33 @@
 
         const { useState, useEffect } = React;
 
+        // --- ROSTER DATA CONFIGURATION ---
+        const EMPLOYEES = {
+            kouridakis:   { name: "Kouridakis Christos", img: "./roster/kouridakis.jpg", role: "Night Ops" },
+            polydorou:    { name: "Polydorou Christos",  img: "./roster/polydorou.jpg", role: "Night Ops" },
+            mezitis:      { name: "Mezitis Aggelos",     img: "./roster/mezitis.jpg", role: "Day Ops" },
+            pateloudi:    { name: "Pateloudi Eleni",     img: "./roster/pateloudi.jpg", role: "Admin/Day" },
+            stathatos:    { name: "Stathatos Filippos",  img: "./roster/stathatos.jpg", role: "Night Ops" },
+            topalis:      { name: "Topalis Dimitris",    img: "./roster/topalis.jpg", role: "Hybrid" },
+            angelopoulos: { name: "Angelopoulos Nikos",  img: "./roster/angelopoulos.jpg", role: "Hybrid" }
+        };
+
+        const SCHEDULE = {
+            MONDAY:    { "09:00": ["mezitis", "pateloudi"] },
+            TUESDAY:   { "09:00": ["mezitis", "pateloudi", "topalis", "angelopoulos"] },
+            WEDNESDAY: { "09:00": ["mezitis", "pateloudi", "topalis", "angelopoulos"] },
+            THURSDAY:  { "09:00": ["mezitis", "pateloudi", "topalis", "angelopoulos"] },
+            FRIDAY:    { 
+                "09:00": ["mezitis", "pateloudi"], 
+                "23:00": ["kouridakis", "polydorou", "stathatos", "topalis", "angelopoulos"] 
+            },
+            SATURDAY:  { 
+                "23:00": ["kouridakis", "polydorou", "stathatos", "topalis", "angelopoulos"] 
+            }
+        };
+
+        const DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+
         // --- UTILS ---
         const formatFullDateTime = (timestamp) => {
             if (!timestamp || !timestamp.toDate) return "PENDING...";
@@ -267,6 +357,68 @@
             );
         };
 
+        const RosterPanel = () => {
+            // Auto-detect current day. If Sunday (0), default to Monday (1)
+            const todayIndex = new Date().getDay(); 
+            const defaultDay = todayIndex === 0 ? "MONDAY" : (DAYS[todayIndex - 1] || "MONDAY");
+
+            const [selectedDay, setSelectedDay] = useState(defaultDay);
+
+            return (
+                <div className="roster-container">
+                    <div className="day-tabs">
+                        {DAYS.map(day => (
+                            <div 
+                                key={day} 
+                                className={`day-tab ${selectedDay === day ? 'active' : ''}`}
+                                onClick={() => setSelectedDay(day)}
+                            >
+                                {day.substring(0,3)}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="roster-content">
+                        {!SCHEDULE[selectedDay] ? (
+                            <div style={{textAlign:'center', padding:'50px', color:'#666', fontSize:'1.2em'}}>NO OPERATIONS SCHEDULED</div>
+                        ) : (
+                            Object.keys(SCHEDULE[selectedDay]).sort().map(time => (
+                                <div key={time} className="time-block">
+                                    <div className="time-header">
+                                        <div className="time-badge">{time}</div>
+                                        <div className="time-line"></div>
+                                        <div style={{color:'var(--text-muted)', fontSize:'0.9em', fontWeight:'bold'}}>SHIFT START</div>
+                                    </div>
+                                    <div className="roster-grid">
+                                        {SCHEDULE[selectedDay][time].map(empKey => {
+                                            const emp = EMPLOYEES[empKey];
+                                            return (
+                                                <div key={empKey} className="roster-card">
+                                                    <div className="qr-frame">
+                                                        <img 
+                                                            src={emp.img} 
+                                                            alt={emp.name}
+                                                            onError={(e) => {
+                                                                e.target.style.display = 'none';
+                                                                e.target.parentNode.style.background = '#222';
+                                                                e.target.parentNode.innerHTML = '<span style="color:#666; font-size:12px;">NO IMAGE</span>';
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div className="emp-name">{emp.name}</div>
+                                                    <div className="emp-role">{emp.role}</div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
         const LiveFeed = () => {
             const [units, setUnits] = useState([]);
             useEffect(() => {
@@ -294,7 +446,7 @@
                             <p className="status">● ON DUTY</p>
                             <p>Last Signal: {formatLastSignal(unit.timestamp)}</p>
                             <code className="coords">{unit.latitude ? unit.latitude.toFixed(5) : '0.0000'}, {unit.longitude ? unit.longitude.toFixed(5) : '0.0000'}</code>
-                            <a href={`https://www.google.com/maps?q=${unit.latitude},${unit.longitude}`} target="_blank" style={{color:'#dc2626', textDecoration:'none', display:'block', marginTop:'15px', fontSize:'0.9em', fontWeight:'bold', textAlign:'right'}}>OPEN MAP &rarr;</a>
+                            <a href={`https://www.google.com/maps?q=${unit.latitude},${unit.longitude}`} target="_blank" style={{color:'#dc2626', textDecoration:'none', display:'block', marginTop:'15px', fontSize:'0.9em', fontWeight:'bold', textAlign:'right'}}>OPEN MAP →</a>
                         </div>
                     ))}
                 </div>
@@ -308,7 +460,6 @@
             const [dynamicAreas, setDynamicAreas] = useState([]);
             
             useEffect(() => {
-                // INCREASED LIMIT TO 2000 FOR PRINTING
                 const unsub = db.collection('scan_logs').orderBy("timestamp", "desc").limit(2000)
                     .onSnapshot(snapshot => {
                         const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -400,7 +551,7 @@
         // --- ROOT COMPONENT ---
         const App = () => {
             const [user, setUser] = useState(null);
-            const [view, setView] = useState('live');
+            const [view, setView] = useState('live'); // 'live', 'logs', 'roster'
             const [loading, setLoading] = useState(true);
 
             useEffect(() => {
@@ -422,6 +573,7 @@
                         <nav>
                             <button className={`nav-btn ${view==='live'?'active':''}`} onClick={()=>setView('live')}>ACTIVE UNITS</button>
                             <button className={`nav-btn ${view==='logs'?'active':''}`} onClick={()=>setView('logs')}>SCAN LOGS</button>
+                            <button className={`nav-btn ${view==='roster'?'active':''}`} onClick={()=>setView('roster')}>ROSTER</button>
                         </nav>
                         <button className="sign-out-btn" onClick={() => auth.signOut()}>SIGN OUT</button>
                     </header>
@@ -429,6 +581,7 @@
                     <main>
                         {view === 'live' && <LiveFeed />}
                         {view === 'logs' && <ScanLogs />}
+                        {view === 'roster' && <RosterPanel />}
                     </main>
                 </div>
             );
@@ -438,5 +591,3 @@
     </script>
 </body>
 </html>
-
-
