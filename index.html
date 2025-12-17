@@ -80,7 +80,7 @@
             flex-direction: column;
         }
         
-        /* GENERAL UI ELEMENTS */
+        /* UI ELEMENTS */
         .btn-primary { background: var(--primary-red); color: white; padding: 10px 20px; border: none; border-radius: 2px; cursor: pointer; font-weight: 700; text-transform: uppercase; font-family: 'Rajdhani', sans-serif; }
         .btn-cyan { background: var(--accent-cyan); color: black; padding: 10px 20px; border: none; border-radius: 2px; cursor: pointer; font-weight: 700; text-transform: uppercase; font-family: 'Rajdhani', sans-serif; }
         .btn-delete { background: transparent; border: 1px solid #444; color: #666; padding: 5px 10px; cursor: pointer; margin-top: 10px; width: 100%; font-size: 0.8em; }
@@ -89,51 +89,26 @@
         input, select { background: #000; color: white; border: 1px solid var(--border-color); padding: 10px; font-family: 'Rajdhani', sans-serif; border-radius: 2px; width: 100%; box-sizing: border-box; }
         input:focus, select:focus { outline: none; border-color: var(--primary-red); }
 
+        /* LOGS FILTERS (RESTORED) */
+        .logs-controls { flex: 0 0 auto; display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 20px; background-color: var(--card-bg); padding: 15px; border: 1px solid var(--border-color); }
+        .filter-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 150px; }
+        .filter-label { color: var(--primary-red); font-size: 12px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+        .filter-select { background: #000; color: white; border: 1px solid var(--border-color); padding: 10px; font-family: 'Rajdhani', sans-serif; border-radius: 2px; width: 100%; height: 40px; }
+        .print-btn { background: #333; color: white; border: 1px solid var(--border-color); padding: 0 20px; cursor: pointer; font-weight: bold; font-family: 'Rajdhani', sans-serif; height: 40px; margin-bottom: 0; }
+        .print-btn:hover { background: var(--primary-red); border-color: var(--primary-red); }
+
         /* ROSTER STYLES */
         .roster-container { overflow-y: auto; height: 100%; padding-right: 10px; position: relative; }
         .day-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
-        .day-tab { 
-            padding: 8px 16px; 
-            background: #000; 
-            border: 1px solid var(--border-color); 
-            color: var(--text-muted); 
-            font-family: 'Rajdhani', sans-serif; 
-            font-weight: bold; 
-            cursor: pointer;
-            flex: 1;
-            text-align: center;
-            min-width: 60px;
-        }
+        .day-tab { padding: 8px 16px; background: #000; border: 1px solid var(--border-color); color: var(--text-muted); font-family: 'Rajdhani', sans-serif; font-weight: bold; cursor: pointer; flex: 1; text-align: center; min-width: 60px; }
         .day-tab.active { background: var(--border-color); color: white; border-color: var(--text-muted); }
-        
         .time-block { margin-bottom: 40px; }
         .time-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
         .time-badge { background: var(--primary-red); color: white; padding: 5px 12px; font-size: 1.2em; font-weight: 700; border-radius: 2px; }
         .time-line { flex: 1; height: 1px; background: var(--border-color); }
-        
         .roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
-        .roster-card { 
-            background: var(--card-bg); 
-            border: 1px solid var(--border-color); 
-            padding: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            text-align: center;
-            position: relative;
-        }
-        .qr-frame { 
-            width: 100%; 
-            aspect-ratio: 1/1; 
-            background: white; 
-            padding: 5px; 
-            margin-bottom: 15px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            overflow: hidden;
-            cursor: pointer;
-        }
+        .roster-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
+        .qr-frame { width: 100%; aspect-ratio: 1/1; background: white; padding: 5px; margin-bottom: 15px; display: flex; justify-content: center; align-items: center; overflow: hidden; cursor: pointer; }
         .qr-frame img { width: 100%; height: 100%; object-fit: contain; }
         .emp-name { font-size: 1.1em; font-weight: 700; color: white; margin-bottom: 5px; }
         .emp-role { font-size: 0.85em; color: var(--primary-red); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; }
@@ -144,7 +119,6 @@
         .modal-header { font-size: 1.5em; font-weight: bold; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; color: var(--primary-red); }
         .form-group { margin-bottom: 15px; }
         .form-label { display: block; color: var(--text-muted); margin-bottom: 5px; font-size: 0.9em; }
-        .schedule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .day-row { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; padding: 5px 0; }
         
         /* LOGIN */
@@ -153,13 +127,12 @@
         .login-box input { width: 100%; margin-bottom: 15px; font-size: 16px; }
         .login-box button { width: 100%; padding: 14px; }
 
-        /* LIVE FEED & LOGS (Re-used styles) */
+        /* LIVE FEED & TABLE */
         .live-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; overflow-y: scroll; height: 100%; padding-right: 10px; -webkit-overflow-scrolling: touch; }
         .live-card { background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--success-color); padding: 20px; border-radius: 4px; }
         .live-card h3 { margin: 0 0 10px 0; color: white; font-size: 1.4em; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
         
         .view-wrapper { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
-        .logs-controls { flex: 0 0 auto; display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; background-color: var(--card-bg); padding: 15px; border: 1px solid var(--border-color); }
         .table-wrapper { flex: 1; overflow-y: scroll; border: 1px solid var(--border-color); background: #000; }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th { text-align: left; padding: 15px; background: #1a1a1a; color: var(--text-muted); border-bottom: 2px solid var(--primary-red); position: sticky; top: 0; }
@@ -210,7 +183,7 @@
         const { useState, useEffect, useRef } = React;
         const DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
 
-        // --- UTILITY: COMPRESS IMAGE TO BASE64 (PREVENTS DATABASE BLOAT) ---
+        // --- UTILITY: IMAGE COMPRESSION ---
         const compressImage = (file) => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -220,20 +193,26 @@
                     img.src = event.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 300; // Resize to 300px width (plenty for QR)
+                        const MAX_WIDTH = 300; 
                         const scaleSize = MAX_WIDTH / img.width;
                         canvas.width = MAX_WIDTH;
                         canvas.height = img.height * scaleSize;
-                        
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        // Convert to Base64 JPEG at 0.7 quality
                         resolve(canvas.toDataURL('image/jpeg', 0.7)); 
                     };
                     img.onerror = error => reject(error);
                 };
                 reader.onerror = error => reject(error);
             });
+        };
+
+        const formatFullDateTime = (timestamp) => {
+            if (!timestamp || !timestamp.toDate) return "PENDING...";
+            try {
+                const d = timestamp.toDate();
+                return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()} ${d.toLocaleTimeString()}`; 
+            } catch(e) { return "ERROR"; }
         };
 
         // --- COMPONENTS ---
@@ -259,21 +238,18 @@
             );
         };
 
-        // --- ROSTER MANAGER & DISPLAY ---
         const RosterPanel = () => {
             const [people, setPeople] = useState([]);
             const [editMode, setEditMode] = useState(false);
             const [selectedDay, setSelectedDay] = useState(() => {
                 const d = new Date().getDay();
-                return d === 0 ? "MONDAY" : DAYS[d-1]; // Default to today (or Mon if Sun)
+                return d === 0 ? "MONDAY" : DAYS[d-1]; 
             });
 
-            // Modal State
             const [showModal, setShowModal] = useState(false);
             const [editingId, setEditingId] = useState(null);
             const [formData, setFormData] = useState({ name: '', role: '', img: '', schedule: {} });
 
-            // Fetch Data
             useEffect(() => {
                 const unsub = db.collection('roster').onSnapshot(snap => {
                     const data = snap.docs.map(d => ({id: d.id, ...d.data()}));
@@ -282,15 +258,9 @@
                 return () => unsub();
             }, []);
 
-            // Handlers
             const handleEdit = (person) => {
                 setEditingId(person.id);
-                setFormData({
-                    name: person.name,
-                    role: person.role,
-                    img: person.img || '',
-                    schedule: person.schedule || {}
-                });
+                setFormData({ name: person.name, role: person.role, img: person.img || '', schedule: person.schedule || {} });
                 setShowModal(true);
             };
 
@@ -306,20 +276,14 @@
                 try {
                     const base64 = await compressImage(file);
                     setFormData(prev => ({...prev, img: base64}));
-                } catch (err) {
-                    alert("Error processing image. Try another.");
-                }
+                } catch (err) { alert("Error processing image."); }
             };
 
             const handleSave = async () => {
                 if(!formData.name) return alert("Name is required");
-                
                 try {
-                    if (editingId) {
-                        await db.collection('roster').doc(editingId).update(formData);
-                    } else {
-                        await db.collection('roster').add(formData);
-                    }
+                    if (editingId) await db.collection('roster').doc(editingId).update(formData);
+                    else await db.collection('roster').add(formData);
                     setShowModal(false);
                 } catch(e) { alert("Save failed: " + e.message); }
             };
@@ -330,7 +294,6 @@
                 setShowModal(false);
             };
 
-            // Schedule Helper
             const updateSchedule = (day, time) => {
                 const newSched = { ...formData.schedule };
                 if (!time || time === "") delete newSched[day];
@@ -338,7 +301,6 @@
                 setFormData(prev => ({ ...prev, schedule: newSched }));
             };
 
-            // Render Logic: Group by Start Time for the Selected Day
             const dailyRoster = {};
             people.forEach(p => {
                 if (p.schedule && p.schedule[selectedDay]) {
@@ -401,48 +363,38 @@
                         )}
                     </div>
 
-                    {/* EDIT MODAL */}
                     {showModal && (
                         <div className="modal-overlay">
                             <div className="modal-box">
-                                <div className="modal-header">
-                                    {editingId ? "EDIT OFFICER" : "NEW OFFICER"}
-                                </div>
+                                <div className="modal-header">{editingId ? "EDIT OFFICER" : "NEW OFFICER"}</div>
                                 <div className="form-group">
                                     <label className="form-label">FULL NAME</label>
-                                    <input value={formData.name} onChange={e=>setFormData({...formData, name:e.target.value})} placeholder="e.g. Papadopoulos Giorgos" />
+                                    <input value={formData.name} onChange={e=>setFormData({...formData, name:e.target.value})} placeholder="Name" />
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">ROLE / DESIGNATION</label>
-                                    <input value={formData.role} onChange={e=>setFormData({...formData, role:e.target.value})} placeholder="e.g. Night Ops" />
+                                    <label className="form-label">ROLE</label>
+                                    <input value={formData.role} onChange={e=>setFormData({...formData, role:e.target.value})} placeholder="Role" />
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">QR CODE IMAGE (Tap to upload)</label>
+                                    <label className="form-label">QR CODE (Tap to upload)</label>
                                     <input type="file" accept="image/*" onChange={handleImageUpload} style={{border:'1px dashed #666'}} />
                                     {formData.img && <div style={{marginTop:'10px', width:'100px', height:'100px', border:'1px solid white'}}><img src={formData.img} style={{width:'100%', height:'100%', objectFit:'contain'}} /></div>}
                                 </div>
                                 
                                 <div className="form-group" style={{marginTop:'20px', borderTop:'1px solid #333', paddingTop:'10px'}}>
-                                    <label className="form-label" style={{color:'var(--accent-cyan)', fontWeight:'bold'}}>WEEKLY SCHEDULE (START TIMES)</label>
+                                    <label className="form-label" style={{color:'var(--accent-cyan)'}}>WEEKLY SCHEDULE</label>
                                     <div style={{display:'flex', flexDirection:'column', gap:'5px'}}>
                                         {DAYS.filter(d=>d!=="SUNDAY").map(day => (
                                             <div key={day} className="day-row">
                                                 <span style={{width:'80px', fontSize:'0.9em', color:'#ccc'}}>{day}</span>
-                                                <input 
-                                                    type="text" 
-                                                    placeholder="OFF" 
-                                                    value={formData.schedule[day] || ''} 
-                                                    onChange={(e) => updateSchedule(day, e.target.value)}
-                                                    style={{width:'100px', textAlign:'center'}}
-                                                />
+                                                <input type="text" placeholder="OFF" value={formData.schedule[day] || ''} onChange={(e) => updateSchedule(day, e.target.value)} style={{width:'100px', textAlign:'center'}} />
                                             </div>
                                         ))}
                                     </div>
-                                    <div style={{fontSize:'0.8em', color:'#666', marginTop:'5px'}}>* Leave blank for OFF-DAY. Enter time like "09:00" or "23:00".</div>
                                 </div>
 
                                 <div style={{display:'flex', gap:'10px', marginTop:'20px'}}>
-                                    <button className="btn-primary" style={{flex:1}} onClick={handleSave}>SAVE DATA</button>
+                                    <button className="btn-primary" style={{flex:1}} onClick={handleSave}>SAVE</button>
                                     <button className="btn-delete" style={{flex:1, border:'1px solid #666', color:'white'}} onClick={()=>setShowModal(false)}>CANCEL</button>
                                 </div>
                                 {editingId && <button className="btn-delete" onClick={handleDelete}>DELETE PERMANENTLY</button>}
@@ -488,39 +440,88 @@
         const ScanLogs = () => {
             const [logs, setLogs] = useState([]);
             const [filterArea, setFilterArea] = useState('ALL');
+            const [filterMonth, setFilterMonth] = useState('');
+            const [dynamicAreas, setDynamicAreas] = useState([]);
             
             useEffect(() => {
-                const unsub = db.collection('scan_logs').orderBy("timestamp", "desc").limit(100)
-                    .onSnapshot(snap => {
-                        setLogs(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+                const unsub = db.collection('scan_logs').orderBy("timestamp", "desc").limit(2000)
+                    .onSnapshot(snapshot => {
+                        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        setLogs(data);
+                        
+                        // Extract unique areas
+                        const foundAreas = new Set();
+                        data.forEach(item => {
+                            const area = item.checkpointData || "";
+                            if (area && area !== "Villa Main Gate") {
+                                foundAreas.add(area);
+                            }
+                        });
+                        setDynamicAreas([...foundAreas].sort());
                     });
                 return () => unsub();
             }, []);
 
-            const formatFullDateTime = (ts) => {
-                if(!ts) return "--";
-                const d = ts.toDate();
-                return `${d.getDate()}/${d.getMonth()+1} ${d.toLocaleTimeString()}`;
-            };
+            const filteredLogs = logs.filter(log => {
+                const area = log.checkpointData || "";
+                
+                // AREA LOGIC
+                let matchArea = false;
+                if (filterArea === 'ALL') matchArea = true;
+                else if (filterArea === 'GROUP_APOTHIKI') matchArea = area.includes("Αποθήκη 56") || area.includes("Apothiki 56");
+                else if (filterArea === 'GROUP_EKALI') matchArea = area.includes("Εκάλη") || area.includes("Ekali");
+                else matchArea = area === filterArea;
+                
+                // DATE LOGIC
+                let matchDate = true;
+                if (filterMonth && log.timestamp && log.timestamp.toDate) {
+                    try {
+                        const d = log.timestamp.toDate();
+                        const logYm = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+                        matchDate = logYm === filterMonth;
+                    } catch(e) { matchDate = false; }
+                }
 
-            const filtered = logs.filter(l => filterArea === 'ALL' || (l.checkpointData && l.checkpointData.includes(filterArea)));
+                return matchArea && matchDate;
+            });
 
             return (
                 <div className="view-wrapper">
                     <div className="logs-controls">
+                        <div className="filter-group">
+                            <label className="filter-label">FILTER BY AREA</label>
+                            <select className="filter-select" value={filterArea} onChange={e => setFilterArea(e.target.value)}>
+                                <option value="ALL">ALL AREAS</option>
+                                <option value="GROUP_APOTHIKI">Αποθήκη 56 (All Points)</option>
+                                <option value="GROUP_EKALI">Εκάλη (All Points)</option>
+                                <option disabled>──────────</option>
+                                {dynamicAreas.map(area => <option key={area} value={area}>{area}</option>)}
+                            </select>
+                        </div>
+                        
+                        <div className="filter-group">
+                            <label className="filter-label">FILTER BY MONTH</label>
+                            <input type="month" className="filter-select" value={filterMonth} onChange={e => setFilterMonth(e.target.value)} />
+                        </div>
+
                         <button className="print-btn" onClick={() => window.print()}>PRINT REPORT</button>
                     </div>
+
                     <div className="table-wrapper">
-                        <table>
-                            <thead><tr><th>TIME</th><th>OFFICER</th><th>LOCATION</th></tr></thead>
+                        <table id="scan-log-table">
+                            <thead><tr><th>DATE & TIME</th><th>OFFICER</th><th>LOCATION</th></tr></thead>
                             <tbody>
-                                {filtered.map(log => (
-                                    <tr key={log.id}>
-                                        <td>{formatFullDateTime(log.timestamp)}</td>
-                                        <td>{log.username}</td>
-                                        <td>{log.checkpointData}</td>
-                                    </tr>
-                                ))}
+                                {filteredLogs.length === 0 ? (
+                                    <tr><td colSpan="3" style={{textAlign:'center', color:'#666'}}>NO RECORDS FOUND</td></tr>
+                                ) : (
+                                    filteredLogs.map(log => (
+                                        <tr key={log.id}>
+                                            <td style={{fontFamily:'monospace', color:'var(--text-muted)'}}>{formatFullDateTime(log.timestamp)}</td>
+                                            <td style={{fontWeight:'bold'}}>{log.username}</td>
+                                            <td style={{color:'white'}}>{log.checkpointData}</td>
+                                        </tr>
+                                    ))
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -531,7 +532,7 @@
         // --- ROOT ---
         const App = () => {
             const [user, setUser] = useState(null);
-            const [view, setView] = useState('roster'); // Default view
+            const [view, setView] = useState('roster'); 
             const [loading, setLoading] = useState(true);
 
             useEffect(() => {
