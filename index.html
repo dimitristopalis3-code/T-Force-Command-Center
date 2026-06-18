@@ -11,7 +11,7 @@
     
     <meta name="theme-color" content="#000000"/>
 
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://generativelanguage.googleapis.com https://en.wikipedia.org https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com; img-src 'self' data: https: blob:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://unpkg.com https://www.gstatic.com https://generativelanguage.googleapis.com https://en.wikipedia.org https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com; img-src 'self' data: https: blob:;">
 
     <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
@@ -34,7 +34,7 @@
             --gold-alert: #FFD700; 
         }
         
-        /* --- CORE LAYOUT --- */
+        /* --- CORE LAYOUT LOCK --- */
         html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; }
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Rajdhani', sans-serif; display: flex; justify-content: center; }
         
@@ -62,9 +62,6 @@
         }
         header h1 { margin: 0; font-size: 1.5em; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
         .title-red { color: var(--primary-red); }
-        
-        .sign-out-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 5px 12px; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-weight: 600; text-transform: uppercase; }
-        .sign-out-btn:hover { border-color: var(--primary-red); color: white; }
 
         /* NAVIGATION */
         nav { display: flex; gap: 10px; }
@@ -141,12 +138,6 @@
         .form-label { display: block; color: var(--text-muted); margin-bottom: 5px; font-size: 0.9em; }
         .day-row { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; padding: 5px 0; }
         
-        /* LOGIN */
-        .login-container { display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; }
-        .login-box { background: var(--card-bg); padding: 40px; border: 1px solid var(--border-color); width: 90%; max-width: 400px; text-align: center; border-radius: 4px; }
-        .login-box input { width: 100%; margin-bottom: 15px; font-size: 16px; }
-        .login-box button { width: 100%; padding: 14px; }
-
         /* VIEW WRAPPERS */
         .view-wrapper { height: 100%; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
         
@@ -182,13 +173,6 @@
 <body>
 
     <div id="root"></div>
-
-    <script>
-        // THIS IS EXACTLY YOUR ORIGINAL CRASH HANDLER. IT WILL NOT BREAK THE SCREEN.
-        window.onerror = function(message, source, lineno, colno, error) {
-            console.error(message);
-        };
-    </script>
     
     <script type="text/babel">
         // --- INIT FIREBASE ---
@@ -210,7 +194,6 @@
         const { useState, useEffect, useRef } = React;
         const DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
 
-        // --- UTILITY: IMAGE COMPRESSION ---
         const compressImage = (file) => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -243,27 +226,6 @@
         };
 
         // --- COMPONENTS ---
-
-        const Login = () => {
-            const [email, setEmail] = useState("");
-            const [pass, setPass] = useState("");
-            const handleLogin = (e) => {
-                e.preventDefault();
-                auth.signInWithEmailAndPassword(email, pass).catch(err => alert(err.message));
-            };
-            return (
-                <div className="login-container">
-                    <div className="login-box">
-                        <h2 style={{color:'var(--primary-red)', marginBottom:'20px'}}>COMMAND ACCESS</h2>
-                        <form onSubmit={handleLogin}>
-                            <input type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required />
-                            <input type="password" placeholder="Password" value={pass} onChange={e=>setPass(e.target.value)} required />
-                            <button type="submit" className="btn-primary">AUTHENTICATE</button>
-                        </form>
-                    </div>
-                </div>
-            );
-        };
 
         const RosterPanel = () => {
             const [people, setPeople] = useState([]);
@@ -604,19 +566,20 @@
         };
 
         const App = () => {
-            const [user, setUser] = useState(null);
             const [view, setView] = useState('roster'); 
             const [loading, setLoading] = useState(true);
 
             useEffect(() => {
-                auth.onAuthStateChanged(u => {
-                    setUser(u);
-                    setLoading(false);
-                });
+                auth.signInAnonymously()
+                    .then(() => setLoading(false))
+                    .catch(error => {
+                        console.error(error);
+                        alert("Database Connection Error: " + error.message);
+                        setLoading(false);
+                    });
             }, []);
 
-            if(loading) return <div style={{color:'red', padding:'20px'}}>SYSTEM INIT...</div>;
-            if (!user) return <Login />;
+            if(loading) return <div style={{color:'var(--primary-red)', padding:'20px', textAlign:'center', marginTop:'50px', fontSize:'24px', letterSpacing:'2px'}}>SYSTEM INIT...</div>;
 
             return (
                 <div style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
@@ -627,7 +590,6 @@
                             <button className={`nav-btn ${view==='logs'?'active':''}`} onClick={()=>setView('logs')}>LOGS</button>
                             <button className={`nav-btn ${view==='roster'?'active':''}`} onClick={()=>setView('roster')}>ROSTER</button>
                         </nav>
-                        <button className="sign-out-btn" onClick={() => auth.signOut()}>EXIT</button>
                     </header>
                     <main>
                         {view === 'live' && <LiveFeed />}
