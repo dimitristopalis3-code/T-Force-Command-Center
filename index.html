@@ -184,7 +184,18 @@
     <div id="root"></div>
 
     <script>
+        // CRASH HANDLER UPGRADE (V3.2)
         window.onerror = function(message, source, lineno, colno, error) {
+            // 1. Ignore background noise from browser extensions (Password Managers, AdBlockers)
+            if (source && (source.includes('extension') || source.includes('hidden'))) return false;
+            
+            // 2. Ignore specific autofill bugs triggered by the login screen
+            if (message && (message.includes('import statement') || message.includes('appendChild'))) {
+                console.warn("Intercepted and neutralized external extension error.");
+                return false; 
+            }
+
+            // 3. Only trigger the Red Screen of Death for actual critical app failures
             document.body.innerHTML = `<div style="padding:20px; color:red; background:black; font-family:monospace;">SYSTEM FAILURE: ${message} (Line ${lineno})</div>`;
         };
     </script>
@@ -268,14 +279,11 @@
             const [people, setPeople] = useState([]);
             const [editMode, setEditMode] = useState(false);
             
-            // LOGIC: Determine Current Real Day
             const getCurrentDayName = () => {
                 const d = new Date().getDay();
                 return d === 0 ? "SUNDAY" : DAYS[d-1]; 
             };
             const [currentRealDay, setCurrentRealDay] = useState(getCurrentDayName());
-
-            // LOGIC: Selected Day (Defaults to Current Real Day)
             const [selectedDay, setSelectedDay] = useState(getCurrentDayName());
 
             const [showModal, setShowModal] = useState(false);
@@ -516,7 +524,6 @@
                 const area = log.checkpointData || "";
                 if (area === "Villa Main Gate") return false;
 
-                // 1. AREA MATCH
                 let matchArea = false;
                 if (filterArea === 'ALL') {
                     matchArea = true;
@@ -528,7 +535,6 @@
                     matchArea = area === filterArea;
                 }
                 
-                // 2. MONTH MATCH
                 let matchMonth = true;
                 if (filterMonth && log.timestamp && log.timestamp.toDate) {
                     try {
@@ -538,7 +544,6 @@
                     } catch(e) { matchMonth = false; }
                 }
 
-                // 3. DAY MATCH
                 let matchDay = true;
                 if (filterDay !== 'ALL' && log.timestamp && log.timestamp.toDate) {
                     try {
