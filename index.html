@@ -11,7 +11,7 @@
     
     <meta name="theme-color" content="#000000"/>
 
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://generativelanguage.googleapis.com https://en.wikipedia.org https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com; img-src 'self' data: https: blob:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://unpkg.com https://www.gstatic.com https://generativelanguage.googleapis.com https://en.wikipedia.org https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com; img-src 'self' data: https: blob:;">
 
     <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
@@ -49,6 +49,7 @@
             flex-direction: column;
         }
         
+        /* HEADER */
         header { 
             flex: 0 0 80px; 
             padding: 0 20px; 
@@ -62,10 +63,12 @@
         header h1 { margin: 0; font-size: 1.5em; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
         .title-red { color: var(--primary-red); }
 
+        /* NAVIGATION */
         nav { display: flex; gap: 10px; }
         .nav-btn { padding: 8px 16px; background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-muted); font-family: 'Rajdhani', sans-serif; cursor: pointer; font-weight: 600; text-transform: uppercase; border-radius: 2px; }
         .nav-btn.active { background-color: var(--primary-red); color: white; border-color: var(--primary-red); }
         
+        /* MAIN LAYOUT */
         main { 
             flex: 1 1 auto; 
             position: relative;
@@ -76,6 +79,7 @@
             min-height: 0;
         }
         
+        /* UI ELEMENTS */
         .btn-primary { background: var(--primary-red); color: white; padding: 10px 20px; border: none; border-radius: 2px; cursor: pointer; font-weight: 700; text-transform: uppercase; font-family: 'Rajdhani', sans-serif; }
         .btn-cyan { background: var(--accent-cyan); color: black; padding: 10px 20px; border: none; border-radius: 2px; cursor: pointer; font-weight: 700; text-transform: uppercase; font-family: 'Rajdhani', sans-serif; }
         .btn-delete { background: transparent; border: 1px solid #444; color: #666; padding: 5px 10px; cursor: pointer; margin-top: 10px; width: 100%; font-size: 0.8em; }
@@ -84,6 +88,7 @@
         input, select { background: #000; color: white; border: 1px solid var(--border-color); padding: 10px; font-family: 'Rajdhani', sans-serif; border-radius: 2px; width: 100%; box-sizing: border-box; }
         input:focus, select:focus { outline: none; border-color: var(--primary-red); }
 
+        /* LOGS FILTERS */
         .logs-controls { flex: 0 0 auto; display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 20px; background-color: var(--card-bg); padding: 15px; border: 1px solid var(--border-color); }
         .filter-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 120px; }
         .filter-label { color: var(--primary-red); font-size: 12px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
@@ -91,10 +96,25 @@
         .print-btn { background: #333; color: white; border: 1px solid var(--border-color); padding: 0 20px; cursor: pointer; font-weight: bold; font-family: 'Rajdhani', sans-serif; height: 40px; margin-bottom: 0; }
         .print-btn:hover { background: var(--primary-red); border-color: var(--primary-red); }
 
+        /* ROSTER STYLES */
         .roster-container { overflow-y: scroll; height: 100%; padding-right: 10px; position: relative; -webkit-overflow-scrolling: touch; }
         .day-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
         
-        .day-tab { padding: 8px 16px; background: #000; border: 1px solid var(--border-color); color: var(--text-muted); font-family: 'Rajdhani', sans-serif; font-weight: bold; cursor: pointer; flex: 1; text-align: center; min-width: 60px; position: relative; transition: all 0.3s ease; }
+        .day-tab { 
+            padding: 8px 16px; 
+            background: #000; 
+            border: 1px solid var(--border-color); 
+            color: var(--text-muted); 
+            font-family: 'Rajdhani', sans-serif; 
+            font-weight: bold; 
+            cursor: pointer; 
+            flex: 1; 
+            text-align: center; 
+            min-width: 60px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
         .day-tab.active { background: var(--border-color); color: white; border-color: var(--text-muted); }
         .day-tab.current-day { border: 2px solid var(--gold-alert) !important; color: var(--gold-alert) !important; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); z-index: 10; }
         .day-tab.active.current-day { background: #1a1a00; }
@@ -110,6 +130,7 @@
         .emp-name { font-size: 1.1em; font-weight: 700; color: white; margin-bottom: 5px; }
         .emp-role { font-size: 0.85em; color: var(--primary-red); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; }
 
+        /* MODAL */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; display: flex; justify-content: center; align-items: center; }
         .modal-box { background: #111; border: 1px solid var(--primary-red); padding: 20px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 0 30px rgba(220, 38, 38, 0.3); }
         .modal-header { font-size: 1.5em; font-weight: bold; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; color: var(--primary-red); }
@@ -117,23 +138,28 @@
         .form-label { display: block; color: var(--text-muted); margin-bottom: 5px; font-size: 0.9em; }
         .day-row { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; padding: 5px 0; }
         
+        /* VIEW WRAPPERS */
         .view-wrapper { height: 100%; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
         
+        /* LIVE FEED */
         .live-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; overflow-y: scroll; height: 100%; padding-right: 10px; -webkit-overflow-scrolling: touch; }
         .live-card { background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--success-color); padding: 20px; border-radius: 4px; height: max-content; }
         .live-card h3 { margin: 0 0 10px 0; color: white; font-size: 1.4em; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
         
+        /* TABLE (SCROLL ENGINE) */
         .table-wrapper { flex: 1 1 auto; overflow-y: scroll; border: 1px solid var(--border-color); background: #000; position: relative; min-height: 0; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th { text-align: left; padding: 15px; background: #1a1a1a; color: var(--text-muted); border-bottom: 2px solid var(--primary-red); position: sticky; top: 0; z-index: 10; }
         td { text-align: left; padding: 15px; border-bottom: 1px solid var(--border-color); color: white; }
 
+        /* AGGRESSIVE SCROLLBAR */
         ::-webkit-scrollbar { width: 16px; height: 16px; display: block !important; background: #000; }
         ::-webkit-scrollbar-track { background: #111; border-left: 1px solid #333; }
         ::-webkit-scrollbar-thumb { background-color: var(--primary-red); border-radius: 2px; border: 3px solid #111; }
         ::-webkit-scrollbar-thumb:hover { background-color: #ff0000; }
         * { scrollbar-width: thin; scrollbar-color: var(--primary-red) #111; }
         
+        /* PRINT FIX */
         @media print {
             body, html, #root, main, .view-wrapper, .table-wrapper { height: auto !important; overflow: visible !important; display: block !important; position: static !important; background-color: white !important; color: black !important; }
             header, nav, .logs-controls, .live-grid, .roster-container, ::-webkit-scrollbar { display: none !important; }
@@ -151,14 +177,14 @@
     </div>
 
     <script>
-        // CRITICAL CRASH CATCHER
         window.onerror = function(message, source, lineno, colno, error) {
+            // Log the error but let the module loader handle it smoothly
             console.error("Native Error Caught:", message);
-            // We log it, but do NOT override the screen anymore, so we don't accidentally block the UI.
+            return false;
         };
     </script>
     
-    <script type="text/babel">
+    <script type="text/babel" data-type="module">
         // --- INIT FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyBwhzGsK-ah7ObMOgpRDlzGghycLNinm6g", 
@@ -178,7 +204,6 @@
         const { useState, useEffect, useRef } = React;
         const DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
 
-        // --- ERROR BOUNDARY TO CATCH SILENT CRASHES ---
         class ErrorBoundary extends React.Component {
             constructor(props) {
                 super(props);
@@ -200,7 +225,6 @@
             }
         }
 
-        // --- UTILITY: IMAGE COMPRESSION ---
         const compressImage = (file) => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -578,18 +602,15 @@
             );
         };
 
-        // --- ROOT ---
         const App = () => {
             const [view, setView] = useState('roster'); 
             const [loading, setLoading] = useState(true);
 
             useEffect(() => {
-                // SMART AUTH: Check if already logged in first.
                 auth.onAuthStateChanged(user => {
                     if (user) {
-                        setLoading(false); // Session exists, clear to proceed.
+                        setLoading(false); 
                     } else {
-                        // No session: attempt Ghost Mode (Anonymous)
                         auth.signInAnonymously()
                             .then(() => setLoading(false))
                             .catch(error => {
