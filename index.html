@@ -62,9 +62,6 @@
         }
         header h1 { margin: 0; font-size: 1.5em; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
         .title-red { color: var(--primary-red); }
-        
-        .sign-out-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 5px 12px; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-weight: 600; text-transform: uppercase; }
-        .sign-out-btn:hover { border-color: var(--primary-red); color: white; }
 
         /* NAVIGATION */
         nav { display: flex; gap: 10px; }
@@ -140,12 +137,6 @@
         .form-group { margin-bottom: 15px; }
         .form-label { display: block; color: var(--text-muted); margin-bottom: 5px; font-size: 0.9em; }
         .day-row { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; padding: 5px 0; }
-        
-        /* LOGIN */
-        .login-container { display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; }
-        .login-box { background: var(--card-bg); padding: 40px; border: 1px solid var(--border-color); width: 90%; max-width: 400px; text-align: center; border-radius: 4px; }
-        .login-box input { width: 100%; margin-bottom: 15px; font-size: 16px; }
-        .login-box button { width: 100%; padding: 14px; }
 
         /* VIEW WRAPPERS */
         .view-wrapper { height: 100%; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
@@ -171,7 +162,7 @@
         /* PRINT FIX */
         @media print {
             body, html, #root, main, .view-wrapper, .table-wrapper { height: auto !important; overflow: visible !important; display: block !important; position: static !important; background-color: white !important; color: black !important; }
-            header, nav, .logs-controls, .live-grid, .sign-out-btn, .roster-container, ::-webkit-scrollbar { display: none !important; }
+            header, nav, .logs-controls, .live-grid, .roster-container, ::-webkit-scrollbar { display: none !important; }
             table { width: 100% !important; border: 1px solid black !important; color: black !important; font-size: 12pt; }
             th { background-color: #eee !important; color: black !important; border-bottom: 2px solid black !important; position: static !important; }
             td { border-bottom: 1px solid #ccc !important; color: black !important; }
@@ -186,17 +177,12 @@
     <script>
         // CRASH HANDLER UPGRADE (V3.2)
         window.onerror = function(message, source, lineno, colno, error) {
-            // 1. Ignore background noise from browser extensions (Password Managers, AdBlockers)
             if (source && (source.includes('extension') || source.includes('hidden'))) return false;
-            
-            // 2. Ignore specific autofill bugs triggered by the login screen
             if (message && (message.includes('import statement') || message.includes('appendChild'))) {
                 console.warn("Intercepted and neutralized external extension error.");
                 return false; 
             }
-
-            // 3. Only trigger the Red Screen of Death for actual critical app failures
-            document.body.innerHTML = `<div style="padding:20px; color:red; background:black; font-family:monospace;">SYSTEM FAILURE: ${message} (Line ${lineno})</div>`;
+            document.body.innerHTML = `<div style="padding:20px; color:red; background:black; font-family:monospace; text-align:center; margin-top:50px;"><h2>SYSTEM FAILURE</h2><p>${message}</p><p>Line ${lineno}</p></div>`;
         };
     </script>
     
@@ -253,27 +239,6 @@
         };
 
         // --- COMPONENTS ---
-
-        const Login = () => {
-            const [email, setEmail] = useState("");
-            const [pass, setPass] = useState("");
-            const handleLogin = (e) => {
-                e.preventDefault();
-                auth.signInWithEmailAndPassword(email, pass).catch(err => alert(err.message));
-            };
-            return (
-                <div className="login-container">
-                    <div className="login-box">
-                        <h2 style={{color:'var(--primary-red)', marginBottom:'20px'}}>COMMAND ACCESS</h2>
-                        <form onSubmit={handleLogin}>
-                            <input type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required />
-                            <input type="password" placeholder="Password" value={pass} onChange={e=>setPass(e.target.value)} required />
-                            <button type="submit" className="btn-primary">AUTHENTICATE</button>
-                        </form>
-                    </div>
-                </div>
-            );
-        };
 
         const RosterPanel = () => {
             const [people, setPeople] = useState([]);
@@ -615,19 +580,21 @@
 
         // --- ROOT ---
         const App = () => {
-            const [user, setUser] = useState(null);
             const [view, setView] = useState('roster'); 
             const [loading, setLoading] = useState(true);
 
             useEffect(() => {
-                auth.onAuthStateChanged(u => {
-                    setUser(u);
-                    setLoading(false);
-                });
+                // Ghost Mode: Silent Anonymous Login
+                auth.signInAnonymously()
+                    .then(() => setLoading(false))
+                    .catch(error => {
+                        console.error(error);
+                        alert("Database Connection Error: " + error.message);
+                        setLoading(false);
+                    });
             }, []);
 
-            if(loading) return <div style={{color:'red', padding:'20px'}}>SYSTEM INIT...</div>;
-            if (!user) return <Login />;
+            if(loading) return <div style={{color:'var(--primary-red)', padding:'20px', textAlign:'center', marginTop:'50px', fontSize:'24px', letterSpacing:'2px'}}>INITIALIZING COMMAND CENTER...</div>;
 
             return (
                 <div style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
@@ -638,7 +605,7 @@
                             <button className={`nav-btn ${view==='logs'?'active':''}`} onClick={()=>setView('logs')}>LOGS</button>
                             <button className={`nav-btn ${view==='roster'?'active':''}`} onClick={()=>setView('roster')}>ROSTER</button>
                         </nav>
-                        <button className="sign-out-btn" onClick={() => auth.signOut()}>EXIT</button>
+                        {/* EXIT BUTTON REMOVED FOR GHOST MODE */}
                     </header>
                     <main>
                         {view === 'live' && <LiveFeed />}
