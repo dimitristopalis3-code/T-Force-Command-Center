@@ -178,13 +178,15 @@
 
     <script>
         window.onerror = function(message, source, lineno, colno, error) {
-            // Log the error but let the module loader handle it smoothly
             console.error("Native Error Caught:", message);
             return false;
         };
     </script>
     
-    <script type="text/babel" data-type="module">
+    <script type="text/babel" data-presets="env,react">
+        /* @jsx React.createElement */
+        /* @jsxFrag React.Fragment */
+
         // --- INIT FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyBwhzGsK-ah7ObMOgpRDlzGghycLNinm6g", 
