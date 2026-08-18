@@ -126,7 +126,11 @@
         .time-line { flex: 1; height: 1px; background: var(--border-color); }
         .roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
         .roster-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
-        .qr-frame { width: 100%; aspect-ratio: 1/1; background: white; padding: 5px; margin-bottom: 15px; display: flex; justify-content: center; align-items: center; overflow: hidden; cursor: pointer; }
+        
+        .card-inner { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; }
+        .on-leave-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); color: #dc2626; display:flex; flex-direction:column; justify-content:center; align-items:center; font-weight:bold; z-index:5; font-size:1.2em; text-transform:uppercase; border: 1px solid #dc2626; }
+
+        .qr-frame { width: 100%; aspect-ratio: 1/1; background: white; padding: 5px; margin-bottom: 15px; display: flex; justify-content: center; align-items: center; overflow: hidden; cursor: pointer; position: relative;}
         .qr-frame img { width: 100%; height: 100%; object-fit: contain; }
         .emp-name { font-size: 1.1em; font-weight: 700; color: white; margin-bottom: 5px; }
         .emp-role { font-size: 0.85em; color: var(--primary-red); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; }
@@ -226,6 +230,11 @@
             } catch(e) { return "ERROR"; }
         };
 
+        const getTodayYMD = () => {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        };
+
         // --- COMPONENTS ---
 
         const RosterPanel = () => {
@@ -241,7 +250,7 @@
 
             const [showModal, setShowModal] = useState(false);
             const [editingId, setEditingId] = useState(null);
-            const [formData, setFormData] = useState({ name: '', role: '', img: '', schedule: {} });
+            const [formData, setFormData] = useState({ name: '', role: '', img: '', schedule: {}, onLeave: false, leaveStart: '', leaveEnd: '' });
 
             useEffect(() => {
                 const interval = setInterval(() => {
@@ -260,13 +269,21 @@
 
             const handleEdit = (person) => {
                 setEditingId(person.id);
-                setFormData({ name: person.name, role: person.role, img: person.img || '', schedule: person.schedule || {} });
+                setFormData({ 
+                    name: person.name, 
+                    role: person.role, 
+                    img: person.img || '', 
+                    schedule: person.schedule || {},
+                    onLeave: person.onLeave || false,
+                    leaveStart: person.leaveStart || '',
+                    leaveEnd: person.leaveEnd || ''
+                });
                 setShowModal(true);
             };
 
             const handleAddNew = () => {
                 setEditingId(null);
-                setFormData({ name: '', role: 'Officer', img: '', schedule: {} });
+                setFormData({ name: '', role: 'Officer', img: '', schedule: {}, onLeave: false, leaveStart: '', leaveEnd: '' });
                 setShowModal(true);
             };
 
@@ -299,6 +316,12 @@
                 if (!time || time === "") delete newSched[day];
                 else newSched[day] = time;
                 setFormData(prev => ({ ...prev, schedule: newSched }));
+            };
+
+            const isPersonOnLeaveToday = (person) => {
+                if (!person.onLeave || !person.leaveStart || !person.leaveEnd) return false;
+                const today = getTodayYMD();
+                return today >= person.leaveStart && today <= person.leaveEnd;
             };
 
             const dailyRoster = {};
@@ -356,16 +379,27 @@
                                         <div className="time-line"></div>
                                     </div>
                                     <div className="roster-grid">
-                                        {dailyRoster[time].map(person => (
-                                            <div key={person.id} className="roster-card">
-                                                <div className="qr-frame" onClick={() => editMode && handleEdit(person)}>
-                                                    {person.img ? <img src={person.img} alt="QR" /> : <span style={{color:'black', fontWeight:'bold'}}>NO QR</span>}
-                                                    {editMode && <div style={{position:'absolute', inset:0, background:'rgba(0,0,0,0.5)', color:'white', display:'flex', alignItems:'center', justifyContent:'center'}}>✏️ EDIT</div>}
+                                        {dailyRoster[time].map(person => {
+                                            const onLeave = isPersonOnLeaveToday(person);
+                                            return (
+                                                <div key={person.id} className="roster-card">
+                                                    <div className="card-inner">
+                                                        {onLeave && (
+                                                            <div className="on-leave-overlay" onClick={() => editMode && handleEdit(person)}>
+                                                                <span>ON LEAVE</span>
+                                                                <span style={{fontSize:'0.7em', marginTop:'5px'}}>Tap to Edit</span>
+                                                            </div>
+                                                        )}
+                                                        <div className="qr-frame" onClick={() => editMode && handleEdit(person)}>
+                                                            {(!onLeave && person.img) ? <img src={person.img} alt="QR" /> : (!onLeave && <span style={{color:'black', fontWeight:'bold'}}>NO QR</span>)}
+                                                            {editMode && <div style={{position:'absolute', inset:0, background:'rgba(0,0,0,0.5)', color:'white', display:'flex', alignItems:'center', justifyContent:'center', zIndex:4}}>✏️ EDIT</div>}
+                                                        </div>
+                                                        <div className="emp-name">{person.name}</div>
+                                                        <div className="emp-role">{person.role}</div>
+                                                    </div>
                                                 </div>
-                                                <div className="emp-name">{person.name}</div>
-                                                <div className="emp-role">{person.role}</div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             ))
@@ -388,6 +422,19 @@
                                     <label className="form-label">QR CODE (Tap to upload)</label>
                                     <input type="file" accept="image/*" onChange={handleImageUpload} style={{border:'1px dashed #666'}} />
                                     {formData.img && <div style={{marginTop:'10px', width:'100px', height:'100px', border:'1px solid white'}}><img src={formData.img} style={{width:'100%', height:'100%', objectFit:'contain'}} /></div>}
+                                </div>
+
+                                <div className="form-group" style={{marginTop:'20px', borderTop:'1px solid #333', paddingTop:'10px'}}>
+                                    <div style={{display:'flex', alignItems:'center', gap:'10px', marginBottom:'10px'}}>
+                                        <input type="checkbox" checked={formData.onLeave} onChange={e=>setFormData({...formData, onLeave: e.target.checked})} style={{width:'auto'}} />
+                                        <label className="form-label" style={{margin:0, color:'var(--primary-red)'}}>ON TEMPORARY LEAVE</label>
+                                    </div>
+                                    {formData.onLeave && (
+                                        <div style={{display:'flex', gap:'10px'}}>
+                                            <input type="date" value={formData.leaveStart} onChange={e=>setFormData({...formData, leaveStart: e.target.value})} />
+                                            <input type="date" value={formData.leaveEnd} onChange={e=>setFormData({...formData, leaveEnd: e.target.value})} />
+                                        </div>
+                                    )}
                                 </div>
                                 
                                 <div className="form-group" style={{marginTop:'20px', borderTop:'1px solid #333', paddingTop:'10px'}}>
