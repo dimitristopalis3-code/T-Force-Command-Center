@@ -33,6 +33,7 @@
             --success-color: #22c55e; 
             --accent-cyan: #06b6d4; 
             --gold-alert: #FFD700; 
+            --alert-bg: rgba(220, 38, 38, 0.1);
         }
         
         /* --- CORE LAYOUT LOCK --- */
@@ -66,8 +67,9 @@
 
         /* NAVIGATION */
         nav { display: flex; gap: 10px; }
-        .nav-btn { padding: 8px 16px; background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-muted); font-family: 'Rajdhani', sans-serif; cursor: pointer; font-weight: 600; text-transform: uppercase; border-radius: 2px; }
+        .nav-btn { padding: 8px 16px; background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-muted); font-family: 'Rajdhani', sans-serif; cursor: pointer; font-weight: 600; text-transform: uppercase; border-radius: 2px; position: relative; }
         .nav-btn.active { background-color: var(--primary-red); color: white; border-color: var(--primary-red); }
+        .nav-alert-badge { position: absolute; top: -5px; right: -5px; background: var(--gold-alert); color: black; width: 18px; height: 18px; border-radius: 9px; font-size: 10px; display: flex; alignItems: center; justifyContent: center; font-weight: bold; }
         
         /* MAIN LAYOUT */
         main { 
@@ -89,7 +91,7 @@
         input, select { background: #000; color: white; border: 1px solid var(--border-color); padding: 10px; font-family: 'Rajdhani', sans-serif; border-radius: 2px; width: 100%; box-sizing: border-box; }
         input:focus, select:focus { outline: none; border-color: var(--primary-red); }
 
-        /* LOGS FILTERS */
+        /* DASHBOARD / LOGS FILTERS */
         .logs-controls { flex: 0 0 auto; display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 20px; background-color: var(--card-bg); padding: 15px; border: 1px solid var(--border-color); }
         .filter-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 120px; }
         .filter-label { color: var(--primary-red); font-size: 12px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
@@ -147,10 +149,30 @@
         .view-wrapper { height: 100%; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
         
         /* LIVE FEED */
-        .live-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; overflow-y: scroll; height: 100%; padding-right: 10px; -webkit-overflow-scrolling: touch; }
-        .live-card { background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--success-color); padding: 20px; border-radius: 4px; height: max-content; }
+        .live-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; overflow-y: scroll; height: 100%; padding-right: 10px; -webkit-overflow-scrolling: touch; }
+        .live-card { background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--success-color); padding: 20px; border-radius: 4px; height: max-content; transition: border-color 0.3s; }
+        .live-card.alert-active { border-left-color: var(--gold-alert); animation: pulse-alert 2s infinite; }
         .live-card h3 { margin: 0 0 10px 0; color: white; font-size: 1.4em; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
         
+        @keyframes pulse-alert {
+            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+        }
+
+        /* DASHBOARD ALERTS */
+        .alert-item { background: var(--alert-bg); border: 1px solid var(--primary-red); padding: 10px; margin-bottom: 10px; border-radius: 2px; display: flex; justify-content: space-between; align-items: center; }
+        .alert-timestamp { color: var(--text-muted); font-size: 0.8em; font-family: monospace; }
+        
+        /* CHAT STYLES */
+        .chat-container { flex: 1 1 auto; display: flex; flex-direction: column; overflow: hidden; background: #000; border: 1px solid var(--border-color); }
+        .chat-messages { flex: 1 1 auto; overflow-y: scroll; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .chat-message { max-width: 80%; padding: 10px; border-radius: 4px; position: relative; }
+        .chat-message.system { background: #111; border: 1px solid #222; align-self: flex-start; }
+        .chat-message.self { background: var(--primary-red); align-self: flex-end; color: white;}
+        .chat-meta { font-size: 0.75em; color: var(--text-muted); margin-bottom: 4px;}
+        .message-input-area { flex: 0 0 auto; padding: 10px; background: #111; border-top: 1px solid var(--border-color); display: flex; gap: 10px; }
+
         /* TABLE (SCROLL ENGINE) */
         .table-wrapper { flex: 1 1 auto; overflow-y: scroll; border: 1px solid var(--border-color); background: #000; position: relative; min-height: 0; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
@@ -167,7 +189,7 @@
         /* PRINT FIX */
         @media print {
             body, html, #root, main, .view-wrapper, .table-wrapper { height: auto !important; overflow: visible !important; display: block !important; position: static !important; background-color: white !important; color: black !important; }
-            header, nav, .logs-controls, .live-grid, .roster-container, ::-webkit-scrollbar { display: none !important; }
+            header, nav, .logs-controls, .live-grid, .roster-container, .chat-container, ::-webkit-scrollbar { display: none !important; }
             table { width: 100% !important; border: 1px solid black !important; color: black !important; font-size: 12pt; }
             th { background-color: #eee !important; color: black !important; border-bottom: 2px solid black !important; position: static !important; }
             td { border-bottom: 1px solid #ccc !important; color: black !important; }
@@ -236,6 +258,62 @@
         };
 
         // --- COMPONENTS ---
+
+        const Dashboard = () => {
+            const [activeUnits, setActiveUnits] = useState([]);
+            const [recentAlerts, setRecentAlerts] = useState([]);
+            
+            useEffect(() => {
+                // Fetch active units
+                const unsubUnits = db.collection('locations').onSnapshot(snap => {
+                    const now = new Date();
+                    const active = snap.docs
+                        .map(d => ({ id: d.id, ...d.data() }))
+                        .filter(u => u.onDuty && u.timestamp && (now - u.timestamp.toDate()) / 1000 / 60 < 60);
+                    setActiveUnits(active);
+                });
+
+                // Fetch recent alerts (last 24 hours for short-term visibility)
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const unsubAlerts = db.collection('alerts')
+                    .where('timestamp', '>', yesterday)
+                    .orderBy('timestamp', 'desc')
+                    .onSnapshot(snap => {
+                        setRecentAlerts(snap.docs.map(d => ({id:d.id, ...d.data()})));
+                    });
+
+                return () => { unsubUnits(); unsubAlerts(); };
+            }, []);
+
+            return (
+                <div className="view-wrapper">
+                    <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'20px', height:'100%'}}>
+                        <div className="table-wrapper" style={{padding:'20px'}}>
+                            <h2 style={{color:'var(--accent-cyan)', marginBottom:'20px'}}>ACTIVE PATROLS ({activeUnits.length})</h2>
+                            {activeUnits.map(u => (
+                                <div key={u.id} style={{padding:'10px', borderBottom:'1px solid #222', display:'flex', justifyContent:'space-between'}}>
+                                    <span style={{fontWeight:'bold'}}>{u.username}</span>
+                                    <span style={{color:'var(--success-color)'}}>ONLINE</span>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="table-wrapper" style={{padding:'20px'}}>
+                            <h2 style={{color:'var(--primary-red)', marginBottom:'20px'}}>URGENT ALERTS ({recentAlerts.length})</h2>
+                            {recentAlerts.map(a => (
+                                <div key={a.id} className="alert-item">
+                                    <div>
+                                        <div style={{fontWeight:'bold'}}>{a.username}</div>
+                                        <div style={{color:'white'}}>{a.message || 'Panic Alert Triggered'}</div>
+                                    </div>
+                                    <div className="alert-timestamp">{formatFullDateTime(a.timestamp)}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
 
         const RosterPanel = () => {
             const [people, setPeople] = useState([]);
@@ -484,9 +562,9 @@
                     <div className="live-grid">
                         {units.length === 0 && <p style={{gridColumn: '1/-1', textAlign:'center', color:'#666', fontSize:'1.2em', marginTop:'50px'}}>NO ACTIVE UNITS DETECTED</p>}
                         {units.map(unit => (
-                            <div key={unit.id} className="live-card">
+                            <div key={unit.id} className={`live-card ${unit.hasPanicAlert ? 'alert-active' : ''}`}>
                                 <h3>{unit.username}</h3>
-                                <p className="status">● ON DUTY</p>
+                                <p className="status">{unit.hasPanicAlert ? '⚠️ EMERGENCY PANIC' : '● ON DUTY'}</p>
                                 <code className="coords">{unit.latitude ? unit.latitude.toFixed(5) : '0.0000'}, {unit.longitude ? unit.longitude.toFixed(5) : '0.0000'}</code>
                             </div>
                         ))}
@@ -613,9 +691,56 @@
             );
         };
 
+        const ChatPanel = () => {
+            const [messages, setMessages] = useState([]);
+            const [newMessage, setNewMessage] = useState('');
+            const messagesEndRef = useRef(null);
+
+            useEffect(() => {
+                const unsub = db.collection('chat')
+                    .orderBy('timestamp', 'asc')
+                    .limitToLast(50)
+                    .onSnapshot(snap => {
+                        setMessages(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+                        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+                    });
+                return () => unsub();
+            }, []);
+
+            const sendMessage = async () => {
+                if (!newMessage.trim()) return;
+                await db.collection('chat').add({
+                    text: newMessage,
+                    username: "COMMAND",
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    senderId: "COMMAND_CENTER"
+                });
+                setNewMessage('');
+            };
+
+            return (
+                <div className="chat-container">
+                    <div className="chat-messages">
+                        {messages.map(msg => (
+                            <div key={msg.id} className={`chat-message ${msg.senderId === 'COMMAND_CENTER' ? 'self' : 'system'}`}>
+                                <div className="chat-meta">{msg.username}</div>
+                                <div>{msg.text}</div>
+                            </div>
+                        ))}
+                        <div ref={messagesEndRef} />
+                    </div>
+                    <div className="message-input-area">
+                        <input value={newMessage} onChange={e => setNewMessage(e.target.value)} placeholder="Type message..." onKeyPress={e => e.key === 'Enter' && sendMessage()} />
+                        <button className="btn-cyan" onClick={sendMessage}>SEND</button>
+                    </div>
+                </div>
+            );
+        };
+
         const App = () => {
-            const [view, setView] = useState('roster'); 
+            const [view, setView] = useState('dashboard'); // Changed default view to dashboard for immediate status awareness
             const [loading, setLoading] = useState(true);
+            const [activeAlertCount, setActiveAlertCount] = useState(0);
 
             useEffect(() => {
                 auth.signInAnonymously()
@@ -625,6 +750,17 @@
                         alert("Database Connection Error: " + error.message);
                         setLoading(false);
                     });
+                
+                // Monitor unread/recent alerts for navigation badge
+                const lastCheck = new Date();
+                lastCheck.setHours(lastCheck.getHours() - 1); // show badge for alerts in last hour
+                const unsubAlerts = db.collection('alerts')
+                    .where('timestamp', '>', lastCheck)
+                    .onSnapshot(snap => {
+                        setActiveAlertCount(snap.docs.length);
+                    });
+
+                return () => unsubAlerts();
             }, []);
 
             if(loading) return <div style={{color:'var(--primary-red)', padding:'20px', textAlign:'center', marginTop:'50px', fontSize:'24px', letterSpacing:'2px'}}>SYSTEM INIT...</div>;
@@ -634,14 +770,21 @@
                     <header>
                         <h1><span className="title-red">T-FORCE</span> COMMAND</h1>
                         <nav>
+                            <button className={`nav-btn ${view==='dashboard'?'active':''}`} onClick={()=>setView('dashboard')}>
+                                DASHBOARD
+                                {activeAlertCount > 0 && <span className="nav-alert-badge">{activeAlertCount}</span>}
+                            </button>
                             <button className={`nav-btn ${view==='live'?'active':''}`} onClick={()=>setView('live')}>LIVE</button>
                             <button className={`nav-btn ${view==='logs'?'active':''}`} onClick={()=>setView('logs')}>LOGS</button>
+                            <button className={`nav-btn ${view==='chat'?'active':''}`} onClick={()=>setView('chat')}>CHAT</button>
                             <button className={`nav-btn ${view==='roster'?'active':''}`} onClick={()=>setView('roster')}>ROSTER</button>
                         </nav>
                     </header>
                     <main>
+                        {view === 'dashboard' && <Dashboard />}
                         {view === 'live' && <LiveFeed />}
                         {view === 'logs' && <ScanLogs />}
+                        {view === 'chat' && <ChatPanel />}
                         {view === 'roster' && <RosterPanel />}
                     </main>
                 </div>
